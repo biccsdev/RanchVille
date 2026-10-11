@@ -1,0 +1,112 @@
+# Architecture — RanchVille
+
+This document is the system shape for later issues: folders, autoloads, data resources, signals, and input abstraction. Repo rules, naming, never-touch files, and the headless test command live in [AGENTS.md](AGENTS.md). Do not contradict AGENTS.md; link it instead.
+
+MVP loop on Quest 3: plant, water, and harvest by hand; sell crops; buy crops and decorations; save and load.
+
+Linear project: [RanchVille](https://linear.app/biccs/project/ranchville-d13837b7f800).
+
+## Folder roles
+
+The repo root is the Godot project root.
+
+| Path | Role |
+|------|------|
+| `addons/` | Godot plugins (Meta OpenXR Vendors, gdUnit4, etc.) |
+| `art/` | Art direction, asset shortlists, design notes |
+| `audio/` | SFX, music, `licenses.md` |
+| `resources/` | Data resources (e.g. CropData `.tres`) |
+| `scenes/` | Game and UI `.tscn` files |
+| `scripts/` | GDScript game logic, managers, components |
+| `store/` | Horizon Store copy, icons, screenshots |
+| `tasks/` | Agent task notes (`todo.md`, lessons) |
+| `tests/` | Headless unit and integration tests |
+
+Planned subfolders (created when their issues land; not required for BIC-12):
+
+| Path | Role |
+|------|------|
+| `scripts/input/` | `HandInput`, fake input, pinch detector, controller mapping |
+| `scripts/farm/` | Soil tile state machine, growth helpers |
+| `scripts/economy/` | `CoinManager` |
+| `scripts/save/` | Versioned JSON save/load |
+| `scripts/audio/` | `AudioManager` |
+| `resources/crops/` | `CropData` `.tres` files |
+
+## Planned autoloads
+
+Register these in `project.godot` only when their issues implement them. Names and jobs are fixed here so later code shares one shape.
+
+| Autoload | Job |
+|----------|-----|
+| **HandInput** | Signal bus for player actions. Sources: hand tracking, controllers, fake input in tests. |
+| **CoinManager** | Coin balance. `add(n)` and `spend(n)`; reject when funds are short or amount is negative. |
+| **GrowthSystem** | Advance watered crops using `CropData` growth time. Headless tests inject a fake clock. |
+| **SaveManager** | Read and write versioned JSON under `user://`. Payload: version, coins, unlocks, tile/crop state. Corrupt JSON or unknown version fails clean or resets to a documented default. |
+| **AudioManager** | Play named SFX and a music bus. Hooks: plant, water, harvest, sell, UI click. Missing files log and skip; they do not crash. |
+
+These are not autoloads: soil tile instances, `Grabbable`, shop UI, unlock rules. Unlock rules stay in data, not in scenes. Settings (volume, input mode, comfort) persist through save or settings keys when those issues land; they do not need a separate autoload in MVP.
+
+## Data resources (crops and economy)
+
+### CropData
+
+Class: `CropData`. Files: `resources/crops/*.tres` (e.g. `wheat_crop.tres`).
+
+Fields (implemented in later issues):
+
+- Growth time
+- Seed cost
+- Sell price
+- Model references
+- At least three visible growth stages, including harvest-ready
+
+Prices and growth data live on the resource, not in `.tscn` files.
+
+### Economy runtime
+
+`CoinManager` holds the running balance. Sell bin and shop read `CropData` sell and seed prices and call `CoinManager.add` / `CoinManager.spend`.
+
+### Save payload
+
+JSON only (not binary). Includes save version, coins, unlocks, and tile/crop state. Path under `user://`, not `res://`.
+
+### Later resources (name only)
+
+Upgrade data and decoration data will be separate resources when their issues ship. Field design is out of scope for this document.
+
+## Input abstraction
+
+Game logic for crops, economy, save/load, soil tiles, and shop must not import OpenXR types.
+
+```mermaid
+flowchart LR
+  HandSource["Hand tracking source"] --> HandInput
+  ControllerSource["Controller source"] --> HandInput
+  FakeSource["Fake input in tests"] --> HandInput
+  HandInput -->|"pinch_started pinch_ended poke"| GameLogic["Farm economy save shop"]
+```
+
+**HandInput** exposes Godot signals:
+
+- `pinch_started`
+- `pinch_ended`
+- `poke`
+
+Hand tracking reads joints and runs a pinch detector (joint positions in, pinched or not out). Thresholds live in a constant or resource, not magic numbers in scenes. Controller trigger or grip maps to pinch start/end; a documented button or poke pose maps to `poke`. XR adapters live under `scripts/input/` and may use OpenXR. All gameplay code subscribes to **HandInput** only.
+
+Tests use a fake input helper that emits the same signals without a headset.
+
+## Headless-testable systems
+
+This is a hard rule:
+
+Crops, economy, and save/load stay in plain GDScript and Godot resources. They stay headless-testable. They do not import OpenXR.
+
+The same rule applies to soil tile logic, `GrowthSystem`, `CropData`, and pinch-detector math (pure input geometry).
+
+Unit and integration tests live in `tests/`. After BIC-10, run the gdUnit4 command documented in [AGENTS.md](AGENTS.md) before moving an issue to **In Review**.
+
+## Open decisions
+
+**In-session vs offline growth** ([BIC-34](https://linear.app/biccs/issue/BIC-34/decide-in-session-timers-only-vs-offline-progression)): not decided. Do not implement offline catch-up until that issue is approved. After approval, record the choice in this section. `GrowthSystem` must follow the approved path only.
