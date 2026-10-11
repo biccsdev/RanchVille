@@ -1,14 +1,16 @@
-# BIC-13 — Pick art style and color palette
+# BIC-6 — Create repo structure, Git LFS, and AGENTS.md
 
 ## Checklist
 
-- [x] Write `art/direction.md` (style sentence, masks, Hearth Day palette)
-- [x] Record 6–10 hex colors (8 in Hearth Day)
-- [x] List 2–3 reference links in `art/direction.md` and on Linear
-- [ ] Human approval comment on BIC-13
+- [x] Create branch from `origin/main`
+- [x] Install Git LFS; add `.gitattributes` for binary types
+- [x] Add `.gitignore` (Godot cache, `/android/`, build artifacts)
+- [x] Add empty folder placeholders with `.gitkeep`
+- [x] Write `AGENTS.md` (folders, naming, never-touch, headless command)
+- [ ] Commit, verify clean `git status`, open PR, move BIC-6 to In Review
 
 ## Review
 
-- **Delivered:** Minimal low-poly token direction, Dorfromantik-style vertex mask pipeline (documented only), Hearth Day 8-color set, three public references.
-- **Branch:** `comprasvictortorres/bic-13-pick-art-style-and-color-palette`
-- **Linear:** Proposal comment + links; issue moved to In Review; fourth AC waits on you.
+- **Delivered:** `.gitignore`, `.gitattributes`, `AGENTS.md`, placeholders for `addons/`, `scenes/`, `scripts/`, `resources/`, `tests/`, `audio/`, `store/`.
+- **Branch:** `comprasvictortorres/bic-6-create-repo-structure-git-lfs-and-agentsmd`
+- **Out of scope:** Godot project, scripts, scenes, test addon.
