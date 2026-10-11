@@ -8,7 +8,7 @@
 - [x] Install Godot OpenXR Vendors **5.1.0-stable** under `addons/godotopenxrvendors/`
 - [x] Remove `addons/.gitkeep`
 - [x] Verify headless editor: GDExtension loads, no plugin errors in log
-- [ ] Commit, open PR (mention `project.godot`), move BIC-7 to In Review
+- [x] Commit, open PR (mention `project.godot`); Linear **In Review** state not configured — left In Progress with PR comment
 
 ## Review
 
