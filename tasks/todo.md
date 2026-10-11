@@ -1,16 +1,19 @@
-# BIC-6 — Create repo structure, Git LFS, and AGENTS.md
+# BIC-7 — Create Godot 4.x project and install Meta OpenXR Vendors plugin
 
 ## Checklist
 
 - [x] Create branch from `origin/main`
-- [x] Install Git LFS; add `.gitattributes` for binary types
-- [x] Add `.gitignore` (Godot cache, `/android/`, build artifacts)
-- [x] Add empty folder placeholders with `.gitkeep`
-- [x] Write `AGENTS.md` (folders, naming, never-touch, headless command)
-- [ ] Commit, verify clean `git status`, open PR, move BIC-6 to In Review
+- [x] Add minimal `project.godot` (Godot 4.7, Forward Plus default)
+- [x] Add default `icon.svg` and import metadata
+- [x] Install Godot OpenXR Vendors **5.1.0-stable** under `addons/godotopenxrvendors/`
+- [x] Remove `addons/.gitkeep`
+- [x] Verify headless editor: GDExtension loads, no plugin errors in log
+- [x] Commit, open PR (mention `project.godot`); Linear **In Review** state not configured — left In Progress with PR comment
 
 ## Review
 
-- **Delivered:** `.gitignore`, `.gitattributes`, `AGENTS.md`, placeholders for `addons/`, `scenes/`, `scripts/`, `resources/`, `tests/`, `audio/`, `store/`.
-- **Branch:** `comprasvictortorres/bic-6-create-repo-structure-git-lfs-and-agentsmd`
-- **Out of scope:** Godot project, scripts, scenes, test addon.
+- **Branch:** `comprasvictortorres/bic-7-create-godot-4x-project-and-install-meta-openxr-vendors`
+- **Plugin:** [5.1.0-stable](https://github.com/GodotVR/godot_openxr_vendors/releases/tag/5.1.0-stable) via `godotopenxrvendorsaddon.zip`
+- **Enabled:** v5 ships as GDExtension (`plugin.gdextension`, `android_aar_plugin=true`); no `plugin.cfg`. Editor verifies GDExtensions on startup.
+- **Out of scope:** gameplay scenes, `export_presets.cfg`, OpenXR project settings, Android templates (BIC-8), gdUnit4 (BIC-10).
+- **Headless note:** Godot 4.7.2 may SIGSEGV on `--editor --quit` after layout load; initialization and GDExtension verification complete before exit.
