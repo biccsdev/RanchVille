@@ -17,3 +17,10 @@ config/icon="res://icon.svg"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
+
+[xr]
+
+openxr/enabled=true
+shaders/enabled=true
+openxr/extensions/hand_tracking=true
+openxr/extensions/meta/passthrough=true

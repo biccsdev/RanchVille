@@ -1,30 +1,33 @@
-# BIC-10 — Set up headless test framework with one example test
+# BIC-8 — Configure Quest 3 Android export preset and CLI export script
 
 ## Checklist
 
 - [x] Create branch from `origin/main`
-- [x] Vendor gdUnit4 **6.2.2** under `addons/gdUnit4/`
-- [x] Enable plugin in `project.godot` (`[editor_plugins]`)
-- [x] Add `tests/example_test.gd` (one passing assert)
-- [x] Add `run_headless_tests.sh` (matches AGENTS.md command)
-- [x] Update AGENTS.md headless section (`--add res://tests`)
-- [x] Ignore `reports/` and `GdUnitRunner.cfg` in `.gitignore`
-- [x] Add `.github/workflows/headless-tests.yml`
+- [x] Add `export_presets.cfg` (Quest 3 APK + Quest 3 AAB)
+- [x] Update `project.godot` (OpenXR, hand tracking, Meta passthrough)
+- [x] Add `export_quest.sh` CLI wrapper
+- [x] Update AGENTS.md, README.md, `.gitignore`
+- [x] Add gdUnit4 export preset and script tests
+- [x] Headless tests: `--xr-mode off` in runner (OpenXR enabled in project)
 - [x] Verify pass: `./run_headless_tests.sh` → exit **0**
-- [x] Verify fail: broken assert → exit **100**
-- [x] Add Biccs **issue** status **In Review** (Started)
-- [x] Move [BIC-10](https://linear.app/biccs/issue/BIC-10) to **In Review**
-- [x] Linear comment on BIC-10 with command and exit-code proof
+- [ ] Open PR (mentions `export_presets.cfg` and `project.godot`)
+- [ ] Move [BIC-8](https://linear.app/biccs/issue/BIC-8) to **In Review**
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-10-set-up-headless-test-framework-with-one-example-test`
+- **Branch:** `comprasvictortorres/bic-8-configure-quest-3-android-export-preset-and-cli-export`
 - **Godot (local):** `/Applications/Godot.app/Contents/MacOS/Godot` 4.7.2.stable
-- **Command:**
+- **Export check:**
+
+  ```bash
+  ./export_quest.sh --check
+  ```
+
+- **Headless tests:**
 
   ```bash
   GODOT_BIN=/Applications/Godot.app/Contents/MacOS/Godot ./run_headless_tests.sh
   ```
 
-- **Exit codes:** 0 pass, 100 test failure (verified locally)
-- **`project.godot`:** edited for BIC-10 scope (gdUnit4 plugin enabled)
+- **Exit code:** 0 (5 test cases)
+- **Preset highlights:** Meta plugin, Quest 3 only, hand tracking optional, passthrough required, `com.biccs.ranchville`
