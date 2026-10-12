@@ -1,34 +1,20 @@
-# BIC-8 — Configure Quest 3 Android export preset and CLI export script
+# BIC-9 — Empty XR scene builds and runs on Quest 3
 
 ## Checklist
 
 - [x] Create branch from `origin/main`
-- [x] Add `export_presets.cfg` (Quest 3 APK + Quest 3 AAB)
-- [x] Update `project.godot` (OpenXR, hand tracking, Meta passthrough)
-- [x] Add `export_quest.sh` CLI wrapper
-- [x] Update AGENTS.md, README.md, `.gitignore`
-- [x] Add gdUnit4 export preset and script tests
-- [x] Headless tests: `--xr-mode off` in runner (OpenXR enabled in project)
-- [x] Verify pass: `./run_headless_tests.sh` → exit **0**
-- [x] Open PR (mentions `export_presets.cfg` and `project.godot`)
-- [x] Move [BIC-8](https://linear.app/biccs/issue/BIC-8) to **In Review**
+- [x] Add `scenes/xr_empty.tscn` and `scripts/xr_bootstrap.gd`
+- [x] Set `run/main_scene` in `project.godot`
+- [x] Add `tests/xr_empty_scene_test.gd`
+- [x] Headless tests: `./run_headless_tests.sh` → exit **0**
+- [x] CLI export: `./export_quest.sh --debug --format apk`
+- [ ] Open PR (mentions `.tscn` and `project.godot`)
+- [ ] Move [BIC-9](https://linear.app/biccs/issue/BIC-9) to **In Review** with headset test steps
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-8-configure-quest-3-android-export-preset-and-cli-export`
+- **Branch:** `comprasvictortorres/bic-9-empty-xr-scene-builds-and-runs-on-quest-3`
 - **Godot (local):** `/Applications/Godot.app/Contents/MacOS/Godot` 4.7.2.stable
-- **Export check:**
-
-  ```bash
-  ./export_quest.sh --check
-  ```
-
-- **Headless tests:**
-
-  ```bash
-  GODOT_BIN=/Applications/Godot.app/Contents/MacOS/Godot ./run_headless_tests.sh
-  ```
-
-- **Exit code:** 0 (5 test cases)
-- **Preset highlights:** Meta plugin, Quest 3 only, hand tracking optional, passthrough required, `com.biccs.ranchville`
-- **PR:** https://github.com/biccsdev/RanchVille/pull/6
+- **Headless tests:** 8 cases, exit **0**
+- **Export:** `builds/ranchville.apk` (~87 MB). First run needs Android build template under `android/build` (gitignored) and `android/.build_version`.
+- **Also changed:** `export_presets.cfg` (`[preset.1.options]` typo), `export_quest.sh` (`--xr-mode off`, `.gdignore` guard), `project.godot` ETC2/ASTC for Android.
