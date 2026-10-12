@@ -10,8 +10,8 @@
 - [x] Add gdUnit4 export preset and script tests
 - [x] Headless tests: `--xr-mode off` in runner (OpenXR enabled in project)
 - [x] Verify pass: `./run_headless_tests.sh` → exit **0**
-- [ ] Open PR (mentions `export_presets.cfg` and `project.godot`)
-- [ ] Move [BIC-8](https://linear.app/biccs/issue/BIC-8) to **In Review**
+- [x] Open PR (mentions `export_presets.cfg` and `project.godot`)
+- [x] Move [BIC-8](https://linear.app/biccs/issue/BIC-8) to **In Review**
 
 ## Review
 
@@ -31,3 +31,4 @@
 
 - **Exit code:** 0 (5 test cases)
 - **Preset highlights:** Meta plugin, Quest 3 only, hand tracking optional, passthrough required, `com.biccs.ranchville`
+- **PR:** https://github.com/biccsdev/RanchVille/pull/6
