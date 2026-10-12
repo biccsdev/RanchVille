@@ -41,13 +41,19 @@ Game logic (crops, economy, save/load) stays in plain scripts and resources. It 
 
 Preferred runner: **gdUnit4** (installed in BIC-10).
 
-Command (exact; BIC-10 must keep AGENTS.md in sync):
+Command (exact):
 
 ```bash
-godot --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode
+godot --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests --ignoreHeadlessMode
 ```
 
-This command is **not runnable** until BIC-10 adds the test addon and an example test. After BIC-10, run it before moving an issue to **In Review**. Exit code 0 means pass; non-zero means fail.
+Local wrapper (same command; set `GODOT_BIN` if `godot` is not on PATH, e.g. macOS `/Applications/Godot.app/Contents/MacOS/Godot`):
+
+```bash
+./run_headless_tests.sh
+```
+
+Run this before moving an issue to **In Review**. Exit code 0 means pass; non-zero means fail (gdUnit4 uses 100 on test failure).
 
 ## Working rules (from Linear)
 

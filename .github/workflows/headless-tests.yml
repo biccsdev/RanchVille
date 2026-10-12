@@ -1,0 +1,28 @@
+name: Headless tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  gdunit4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.7.2
+        run: |
+          curl -sL "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" -o godot.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          sudo mv Godot_v4.7.2-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+
+      - name: Import project
+        run: godot --headless --path . --import --quit || true
+
+      - name: Run headless tests
+        env:
+          GODOT_BIN: godot
+        run: chmod +x ./run_headless_tests.sh && ./run_headless_tests.sh
