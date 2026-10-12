@@ -1,8 +1,14 @@
 name: Headless tests
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   gdunit4:
@@ -23,6 +29,80 @@ jobs:
         run: godot --headless --path . --import --quit || true
 
       - name: Run headless tests
+        id: tests
         env:
           GODOT_BIN: godot
-        run: chmod +x ./run_headless_tests.sh && ./run_headless_tests.sh
+        run: |
+          chmod +x ./run_headless_tests.sh
+          set -o pipefail
+          ./run_headless_tests.sh 2>&1 | tee test-output.log
+
+      - name: Post result to PR thread
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- ranchville-headless-tests -->';
+            const outcome = '${{ steps.tests.outcome }}';
+            const resultLabel = outcome === 'success' ? 'Passed' : 'Failed';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const issueNumber = context.payload.pull_request.number;
+
+            let logTail = '(no log captured)';
+            try {
+              const lines = fs.readFileSync('test-output.log', 'utf8').split('\n');
+              logTail = lines.slice(-120).join('\n');
+              if (logTail.length > 12000) {
+                logTail = logTail.slice(-12000);
+              }
+            } catch (e) {
+              logTail = `Could not read test-output.log: ${e.message}`;
+            }
+
+            const body = `${marker}
+            ## Headless tests (gdUnit4)
+
+            | | |
+            |---|---|
+            | **Result** | ${resultLabel} |
+            | **Workflow** | [${process.env.GITHUB_WORKFLOW} run](${runUrl}) |
+            | **Commit** | \`${process.env.GITHUB_SHA}\` |
+            | **Godot** | 4.7.2 (linux headless) |
+
+            <details>
+            <summary>Test log (last 120 lines)</summary>
+
+            \`\`\`
+            ${logTail}
+            \`\`\`
+
+            </details>
+            `.trim();
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100,
+            });
+
+            const existing = comments.find(
+              (c) => c.user?.type === 'Bot' && c.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body,
+              });
+            }
