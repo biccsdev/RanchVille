@@ -1,20 +1,17 @@
-# BIC-9 — Empty XR scene builds and runs on Quest 3
+# BIC-11 — Enable passthrough in the empty scene
 
 ## Checklist
 
 - [x] Create branch from `origin/main`
-- [x] Add `scenes/xr_empty.tscn` and `scripts/xr_bootstrap.gd`
-- [x] Set `run/main_scene` in `project.godot`
-- [x] Add `tests/xr_empty_scene_test.gd`
-- [x] Headless tests: `./run_headless_tests.sh` → exit **0**
-- [x] CLI export: `./export_quest.sh --debug --format apk`
+- [x] Transparent environment in `scenes/xr_empty.tscn` (no sky, no floor)
+- [x] Passthrough bootstrap in `scripts/xr_bootstrap.gd`
+- [x] `openxr/environment_blend_mode=2` in `project.godot`
+- [x] Extend `tests/xr_empty_scene_test.gd`
+- [x] Headless tests: `./run_headless_tests.sh` → gdUnit exit **0** (11 cases)
+- [ ] CLI export: `./export_quest.sh --debug --format apk`
 - [ ] Open PR (mentions `.tscn` and `project.godot`)
-- [ ] Move [BIC-9](https://linear.app/biccs/issue/BIC-9) to **In Review** with headset test steps
+- [ ] Move [BIC-11](https://linear.app/biccs/issue/BIC-11) to **In Review** with headset test steps
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-9-empty-xr-scene-builds-and-runs-on-quest-3`
-- **Godot (local):** `/Applications/Godot.app/Contents/MacOS/Godot` 4.7.2.stable
-- **Headless tests:** 8 cases, exit **0**
-- **Export:** `builds/ranchville.apk` (~87 MB). First run needs Android build template under `android/build` (gitignored) and `android/.build_version`.
-- **Also changed:** `export_presets.cfg` (`[preset.1.options]` typo), `export_quest.sh` (`--xr-mode off`, `.gdignore` guard), `project.godot` ETC2/ASTC for Android.
+- **Branch:** `comprasvictortorres/bic-11-enable-passthrough-in-the-empty-scene-and-verify-on-headset`
