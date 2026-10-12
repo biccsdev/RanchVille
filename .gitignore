@@ -16,3 +16,7 @@
 # Quest build artifacts
 *.apk
 *.aab
+
+# gdUnit4 generated output
+reports/
+GdUnitRunner.cfg
