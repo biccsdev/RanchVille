@@ -14,8 +14,11 @@
 *.swo
 
 # Quest build artifacts
+builds/
 *.apk
 *.aab
+*.keystore
+local.export.env
 
 # gdUnit4 generated output
 reports/

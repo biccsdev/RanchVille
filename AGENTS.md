@@ -44,8 +44,10 @@ Preferred runner: **gdUnit4** (installed in BIC-10).
 Command (exact):
 
 ```bash
-godot --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests --ignoreHeadlessMode
+godot --headless --xr-mode off --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --add res://tests --ignoreHeadlessMode
 ```
+
+Use `--xr-mode off` so headless runs do not wait on OpenXR when `openxr/enabled` is true in `project.godot`.
 
 Local wrapper (same command; set `GODOT_BIN` if `godot` is not on PATH, e.g. macOS `/Applications/Godot.app/Contents/MacOS/Godot`):
 
@@ -54,6 +56,20 @@ Local wrapper (same command; set `GODOT_BIN` if `godot` is not on PATH, e.g. mac
 ```
 
 Run this before moving an issue to **In Review**. Exit code 0 means pass; non-zero means fail (gdUnit4 uses 100 on test failure).
+
+## Quest 3 export (CLI)
+
+Headless Android export for Meta Quest 3 (presets **Quest 3** and **Quest 3 AAB** in `export_presets.cfg`). Do not commit keystore files or passwords; use env vars (see Godot [Android export environment variables](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_android.html#environment-variables)).
+
+Local wrapper (set `GODOT_BIN` if `godot` is not on PATH):
+
+```bash
+./export_quest.sh --check
+./export_quest.sh --debug --format apk
+./export_quest.sh --release --format aab
+```
+
+Release builds require `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. The script exits non-zero on export failure or missing release signing env.
 
 ## Working rules (from Linear)
 
