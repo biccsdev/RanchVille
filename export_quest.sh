@@ -120,7 +120,12 @@ cd "$ROOT"
 
 if [[ ! -d android/build ]]; then
 	echo "export_quest.sh: installing Android build template..."
-	"$GODOT_BIN" --headless --path . --install-android-build-template --quit
+	"$GODOT_BIN" --headless --xr-mode off --path . --install-android-build-template --quit
+fi
+
+# Prevent Godot from importing Gradle res assets (creates invalid *.import in res/).
+if [[ -d android/build ]] && [[ ! -f android/build/.gdignore ]]; then
+	touch android/build/.gdignore
 fi
 
 EXPORT_FLAG="--export-debug"
@@ -130,7 +135,7 @@ fi
 
 echo "export_quest.sh: exporting preset \"$PRESET\" to \"$OUTPUT\"..."
 set +e
-"$GODOT_BIN" --headless --path . "$EXPORT_FLAG" "$PRESET" "$OUTPUT"
+"$GODOT_BIN" --headless --xr-mode off --path . "$EXPORT_FLAG" "$PRESET" "$OUTPUT"
 GODOT_EXIT=$?
 set -e
 
