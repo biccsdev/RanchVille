@@ -46,3 +46,13 @@ func test_release_restores_original_parent_and_world_pose() -> void:
 	assert_object(grabbable.get_parent()).is_same(world)
 	assert_vector(grabbable.global_position).is_equal(release_pos)
 	assert_bool(grabbable.is_held()).is_false()
+
+
+func test_set_highlighted_toggles_outline() -> void:
+	var grabbable: Node3D = _GrabbableScript.new()
+	_add_to_tree(grabbable)
+	grabbable.set_highlighted(true)
+	var outline: Node = grabbable.get_node("GrabHighlight")
+	assert_bool(outline.visible).is_true()
+	grabbable.set_highlighted(false)
+	assert_bool(outline.visible).is_false()

@@ -88,7 +88,7 @@ func test_grab_blocked_until_table_placed() -> void:
 	var ctx := _wire_scene()
 	var anchor: Node = _TableAnchorScript.new()
 	auto_free(anchor)
-	anchor.mode = _TableAnchorScript.Mode.MANUAL
+	anchor.mode = _TableAnchorScript.Mode.SEEKING
 	ctx["grab_system"].table_anchor = anchor
 	ctx["fake"].pinch_start(&"right")
 	assert_bool(ctx["near"].is_held()).is_false()

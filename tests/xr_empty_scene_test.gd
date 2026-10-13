@@ -63,8 +63,12 @@ func test_xr_empty_has_farm_root_and_scene_manager() -> void:
 	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
 	assert_object(farm_root).is_not_null()
 	assert_bool(farm_root.has_node("Marker")).is_true()
-	var marker: MeshInstance3D = farm_root.get_node("Marker") as MeshInstance3D
-	var box: BoxMesh = marker.mesh as BoxMesh
+	var marker: Node = farm_root.get_node("Marker")
+	var marker_script: Script = marker.get_script()
+	assert_object(marker_script).is_not_null()
+	assert_str(marker_script.resource_path).is_equal("res://scripts/grab/grabbable.gd")
+	var marker_mesh: MeshInstance3D = marker.get_node("Mesh") as MeshInstance3D
+	var box: BoxMesh = marker_mesh.mesh as BoxMesh
 	assert_object(box).is_not_null()
 	assert_vector(box.size).is_equal(Vector3(0.075, 0.075, 0.075))
 	var origin: XROrigin3D = root.get_node("XROrigin3D") as XROrigin3D
@@ -77,6 +81,12 @@ func test_project_enables_meta_scene_api() -> void:
 	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
 	assert_str(text).contains("openxr/extensions/meta/scene_api=true")
 	assert_str(text).contains("openxr/extensions/meta/anchor_api=true")
+
+
+func test_project_registers_openxr_action_map() -> void:
+	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
+	assert_str(text).contains('openxr/action_map="res://openxr_action_map.tres"')
+	assert_file("res://openxr_action_map.tres").is_file()
 
 
 func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:

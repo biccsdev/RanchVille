@@ -116,7 +116,9 @@ Tests use a fake input helper that emits the same signals without a headset.
 
 **GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold. Grab is disabled until **TableAnchor** is in `PLACED` mode (manual table confirm still uses trigger on **TableAnchor** directly).
 
-Debug prop: `scenes/debug_grabbable.tscn` instanced under **FarmRoot** in `scenes/xr_empty.tscn`.
+Debug props: gray and orange `Grabbable` cubes under **FarmRoot** (`Marker` and `DebugGrabbable`). In-range targets show a yellow outline before pinch.
+
+**HandInteractionPoint** (`scripts/xr/hand_interaction_point.gd`) on each hand’s `InteractionPoint` child tracks the index tip for grab range. **HandInputXr** reads hand-joint pinch via **PinchDetector**, and falls back to controller `trigger` / `trigger_click`. `project.godot` references `openxr_action_map.tres` for Quest actions.
 
 ## Table anchor and FarmRoot (BIC-18)
 

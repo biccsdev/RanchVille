@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/xr/hand_input_xr.gd" id="4_hand_input_xr"]
 [ext_resource type="Script" path="res://scripts/grab/grab_system.gd" id="5_grab_system"]
 [ext_resource type="PackedScene" path="res://scenes/debug_grabbable.tscn" id="6_debug_grabbable"]
+[ext_resource type="Script" path="res://scripts/xr/hand_interaction_point.gd" id="7_interaction_point"]
+[ext_resource type="PackedScene" path="res://scenes/debug_grabbable_gray.tscn" id="8_debug_grabbable_gray"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_marker"]
 size = Vector3(0.075, 0.075, 0.075)
@@ -29,18 +31,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 tracker = &"right_hand"
 pose = &"grip"
 
+[node name="InteractionPoint" type="Node3D" parent="XROrigin3D/RightHand"]
+script = ExtResource("7_interaction_point")
+hand_tracker_name = &"right_hand"
+
 [node name="LeftHand" type="XRController3D" parent="XROrigin3D" unique_id=1693494274]
 tracker = &"left_hand"
 pose = &"grip"
+
+[node name="InteractionPoint" type="Node3D" parent="XROrigin3D/LeftHand"]
+script = ExtResource("7_interaction_point")
+hand_tracker_name = &"left_hand"
 
 [node name="OpenXRFbSceneManager" type="OpenXRFbSceneManager" parent="XROrigin3D" unique_id=1592520967]
 scenes/table = ExtResource("3_table_surface")
 
 [node name="FarmRoot" type="Node3D" parent="." unique_id=2137784906]
 
-[node name="Marker" type="MeshInstance3D" parent="FarmRoot" unique_id=1585539360]
+[node name="Marker" parent="FarmRoot" instance=ExtResource("8_debug_grabbable_gray")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0375, 0)
-mesh = SubResource("BoxMesh_marker")
 
 [node name="DebugGrabbable" parent="FarmRoot" instance=ExtResource("6_debug_grabbable")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.0375, 0)
@@ -55,8 +64,8 @@ right_hand = NodePath("../XROrigin3D/RightHand")
 
 [node name="GrabSystem" type="Node" parent="."]
 script = ExtResource("5_grab_system")
-left_hand_holder = NodePath("../XROrigin3D/LeftHand")
-right_hand_holder = NodePath("../XROrigin3D/RightHand")
+left_hand_holder = NodePath("../XROrigin3D/LeftHand/InteractionPoint")
+right_hand_holder = NodePath("../XROrigin3D/RightHand/InteractionPoint")
 table_anchor = NodePath("../TableAnchor")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=454710415]
