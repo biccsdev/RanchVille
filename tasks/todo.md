@@ -1,17 +1,16 @@
-# BIC-15 — Input abstraction: HandInput with signals and fake input
+# BIC-21 — Soil tile state machine, unit-tested
 
 ## Checklist
 
 - [x] Create branch from `origin/main`
-- [x] Add `scripts/input/hand_input.gd` (signals + emit methods)
-- [x] Add `scripts/input/fake_hand_input.gd`
-- [x] Register HandInput autoload in `project.godot`
-- [x] Add `tests/hand_input_test.gd`
+- [x] Add `scripts/farm/soil_tile.gd` (enum, till/plant, state_changed)
+- [x] Add `tests/soil_tile_test.gd`
 - [x] Run `./run_headless_tests.sh`
-- [ ] Open PR; note `project.godot` autoload edit
-- [ ] Move BIC-15 to **In Review**
+- [ ] Open PR (no `.tscn` change)
+- [ ] Move BIC-21 to **In Review**
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-15-input-abstraction-handinput-with-signals-and-fake-input`
+- **Branch:** `comprasvictortorres/bic-21-soil-tile-state-machine-unit-tested`
 - **PR:** (pending)
+- **Headless:** 28/28 passed (local Godot 4.7.2; gdUnit exit 0; OpenXR vendor SIGSEGV on shutdown locally)
