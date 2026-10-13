@@ -1,8 +1,11 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://kunifnw2djte"]
 
-[ext_resource type="Script" path="res://scripts/xr_bootstrap.gd" id="1_bootstrap"]
-[ext_resource type="Script" path="res://scripts/xr/table_anchor.gd" id="2_table_anchor"]
+[ext_resource type="Script" uid="uid://0be8hm45m8u3" path="res://scripts/xr_bootstrap.gd" id="1_bootstrap"]
+[ext_resource type="Script" uid="uid://p7qbwvgu631h" path="res://scripts/xr/table_anchor.gd" id="2_table_anchor"]
 [ext_resource type="PackedScene" path="res://scenes/table_surface.tscn" id="3_table_surface"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_marker"]
+size = Vector3(0.075, 0.075, 0.075)
 
 [sub_resource type="Environment" id="Environment_world"]
 background_mode = 1
@@ -11,41 +14,37 @@ ambient_light_source = 2
 ambient_light_color = Color(0.4, 0.45, 0.5, 1)
 ambient_light_energy = 0.8
 
-[sub_resource type="BoxMesh" id="BoxMesh_marker"]
-size = Vector3(0.075, 0.075, 0.075)
-
-[node name="XrEmpty" type="Node3D"]
+[node name="XrEmpty" type="Node3D" unique_id=250355903]
 script = ExtResource("1_bootstrap")
 
-[node name="XROrigin3D" type="XROrigin3D" parent="."]
+[node name="XROrigin3D" type="XROrigin3D" parent="." unique_id=1715685176]
 
-[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D" unique_id=1799044771]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 
-[node name="RightHand" type="XRController3D" parent="XROrigin3D"]
+[node name="RightHand" type="XRController3D" parent="XROrigin3D" unique_id=562989756]
 tracker = &"right_hand"
 pose = &"grip"
 
-[node name="LeftHand" type="XRController3D" parent="XROrigin3D"]
+[node name="LeftHand" type="XRController3D" parent="XROrigin3D" unique_id=1693494274]
 tracker = &"left_hand"
 pose = &"grip"
 
-[node name="OpenXRFbSceneManager" type="OpenXRFbSceneManager" parent="XROrigin3D"]
+[node name="OpenXRFbSceneManager" type="OpenXRFbSceneManager" parent="XROrigin3D" unique_id=1592520967]
 scenes/table = ExtResource("3_table_surface")
 
-[node name="FarmRoot" type="Node3D" parent="."]
-visible = false
+[node name="FarmRoot" type="Node3D" parent="." unique_id=2137784906]
 
-[node name="Marker" type="MeshInstance3D" parent="FarmRoot"]
+[node name="Marker" type="MeshInstance3D" parent="FarmRoot" unique_id=1585539360]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0375, 0)
 mesh = SubResource("BoxMesh_marker")
 
-[node name="TableAnchor" type="Node" parent="."]
+[node name="TableAnchor" type="Node" parent="." unique_id=201104749]
 script = ExtResource("2_table_anchor")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=454710415]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 4, 0)
 shadow_enabled = true
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=130326481]
 environment = SubResource("Environment_world")

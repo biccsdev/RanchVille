@@ -21,7 +21,7 @@ HandInput="*res://scripts/input/hand_input.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/ranchville_live_deploy/plugin.cfg")
 
 [rendering]
 

@@ -7,23 +7,25 @@ enum Mode { SEEKING, MANUAL, PLACED }
 
 const SETTLE_SEC := 1.0
 const NO_TABLE_SEC := 3.0
-const CUBE_SIZE_M := 0.075
-const MARKER_SURFACE_OFFSET_Y := CUBE_SIZE_M * 0.5
 const SCENE_PERMISSION := "com.oculus.permission.USE_SCENE"
 const MANUAL_PREVIEW_FORWARD_M := 0.7
-const MANUAL_PREVIEW_DROP_M := 0.55
-const TABLE_OFFSET_RIGHT := 0.25
-const TABLE_OFFSET_TOWARD := 0.20
+const MANUAL_PREVIEW_DROP_M := 0.25
+const HAND_HOVER_UP_M := 0.08
+
+@export var cube_size_m := 0.075
+@export var table_offset_right := 0.25
+@export var table_offset_toward := 0.35
 
 var mode: Mode = Mode.SEEKING
 var _capture_requested := false
 var _table_candidates: Array[XRAnchor3D] = []
 var _settle_generation := 0
 var _no_table_generation := 0
+var _placed_anchor: Node3D
+var _placed_toward := Vector3.ZERO
 
 @onready var _farm_root: Node3D = $"../FarmRoot"
 @onready var _world_root: Node3D = get_parent()
-@onready var _xr_origin: XROrigin3D = $"../XROrigin3D"
 @onready var _camera: XRCamera3D = $"../XROrigin3D/XRCamera3D"
 @onready var _scene_manager: OpenXRFbSceneManager = $"../XROrigin3D/OpenXRFbSceneManager"
 @onready var _right_hand: XRController3D = $"../XROrigin3D/RightHand"
@@ -31,8 +33,9 @@ var _no_table_generation := 0
 
 
 func _ready() -> void:
+	_style_marker()
 	if _farm_root != null:
-		_farm_root.visible = false
+		_farm_root.visible = true
 
 	var hand_input: Node = get_node_or_null("/root/HandInput")
 	if hand_input != null:
@@ -56,7 +59,13 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if mode != Mode.MANUAL:
+	if _farm_root == null:
+		return
+	_farm_root.visible = true
+	if mode == Mode.PLACED:
+		_ensure_placed_anchor()
+		if _placed_anchor != null:
+			_apply_placed_table_pose()
 		return
 	_farm_root.global_transform = _manual_preview_transform()
 
@@ -81,12 +90,11 @@ func _request_scene_permission() -> void:
 	OS.request_permission(SCENE_PERMISSION)
 
 
-func _active_controller() -> XRController3D:
-	if _right_hand != null and _right_hand.is_active():
-		return _right_hand
-	if _left_hand != null and _left_hand.is_active():
-		return _left_hand
-	return null
+func _right_hand_tracked() -> bool:
+	return (
+		_right_hand != null
+		and (_right_hand.get_has_tracking_data() or _right_hand.get_is_active())
+	)
 
 
 func _on_scene_anchor_created(_scene_node: Object, spatial_entity: OpenXRFbSpatialEntity) -> void:
@@ -172,15 +180,33 @@ func _on_scene_capture_completed(success: bool) -> void:
 	_restart_no_table_timer()
 
 
-func _on_controller_button_pressed(name: StringName, hand: XRController3D) -> void:
-	if name == &"trigger_click" and mode == Mode.MANUAL:
-		confirm_manual(hand.global_transform)
+func _on_controller_button_pressed(button_name: StringName, hand: XRController3D) -> void:
+	if button_name == &"trigger_click" and mode == Mode.MANUAL:
+		confirm_manual(hover_over_hand(hand.global_transform))
 
 
 func _on_hand_poke() -> void:
 	if mode != Mode.MANUAL:
 		return
 	confirm_manual(_manual_preview_transform())
+
+
+func _style_marker() -> void:
+	if _farm_root == null:
+		return
+	var marker := _farm_root.get_node_or_null("Marker") as MeshInstance3D
+	if marker == null:
+		return
+	var box := marker.mesh as BoxMesh
+	if box == null:
+		box = BoxMesh.new()
+		marker.mesh = box
+	box.size = Vector3(cube_size_m, cube_size_m, cube_size_m)
+	if marker.material_override == null:
+		var mat := StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_color = Color(0.85, 0.85, 0.88, 1.0)
+		marker.material_override = mat
 
 
 func enter_manual_mode() -> void:
@@ -190,23 +216,60 @@ func enter_manual_mode() -> void:
 
 
 func place_on_table(anchor: XRAnchor3D) -> void:
-	var toward := Vector3.ZERO
+	_placed_anchor = anchor
+	_placed_toward = Vector3.ZERO
 	if _camera != null:
-		toward = _camera.global_position - anchor.global_position
-	var aligned := table_place_offset(
-		surface_height_from_anchor(anchor),
-		surface_size_from_anchor(anchor),
-		toward
-	)
-	var world_xz := Vector3(aligned.x, 0.0, aligned.z)
-	var local_xz := world_xz
-	if anchor.is_inside_tree():
-		local_xz = anchor.global_transform.basis.inverse() * world_xz
-	var local_origin := Vector3(local_xz.x, aligned.y, local_xz.z)
-	attach_farm_to_anchor(_farm_root, anchor, MARKER_SURFACE_OFFSET_Y, local_origin)
+		_placed_toward = _camera.global_position - anchor.global_position
+	_apply_placed_table_pose()
 	if _farm_root != null:
 		_farm_root.visible = true
 	mode = Mode.PLACED
+
+
+func _ensure_placed_anchor() -> void:
+	if _placed_anchor != null and is_instance_valid(_placed_anchor):
+		return
+	if _farm_root == null:
+		return
+	var parent := _farm_root.get_parent() as Node3D
+	if parent == null or parent == _world_root:
+		return
+	_placed_anchor = parent
+
+
+func _apply_placed_table_pose() -> void:
+	if _placed_anchor == null or _farm_root == null:
+		return
+	if not is_instance_valid(_placed_anchor):
+		return
+	if _placed_toward == Vector3.ZERO and _camera != null:
+		_placed_toward = _camera.global_position - _placed_anchor.global_position
+	var toward := _placed_toward
+	var height := surface_height_from_anchor(_placed_anchor)
+	var aligned := table_place_offset(
+		height,
+		surface_size_from_anchor(_placed_anchor),
+		toward,
+		table_offset_right,
+		table_offset_toward
+	)
+	if _placed_anchor.is_inside_tree() and _farm_root.is_inside_tree():
+		if _farm_root.get_parent() != _placed_anchor:
+			_farm_root.reparent(_placed_anchor)
+		var top := _placed_anchor.to_global(Vector3(0.0, height, 0.0))
+		_farm_root.global_position = top + Vector3(aligned.x, 0.0, aligned.z)
+		_farm_root.global_basis = Basis.IDENTITY
+		var marker: Node3D = _farm_root.get_node_or_null("Marker") as Node3D
+		if marker != null:
+			marker.position = Vector3(0.0, cube_size_m * 0.5, 0.0)
+	else:
+		attach_farm_to_anchor(
+			_farm_root,
+			_placed_anchor,
+			cube_size_m * 0.5,
+			Vector3(aligned.x, aligned.y, aligned.z)
+		)
+	_style_marker()
 
 
 func confirm_manual(world_transform: Transform3D) -> void:
@@ -217,16 +280,18 @@ func confirm_manual(world_transform: Transform3D) -> void:
 
 
 func _manual_preview_transform(controller_transform: Transform3D = Transform3D.IDENTITY) -> Transform3D:
-	var hand := _active_controller()
-	if hand != null:
-		var xf := hand.global_transform
-		xf.origin.y = maxf(xf.origin.y, 0.0)
-		return xf
+	if _right_hand_tracked():
+		return hover_over_hand(_right_hand.global_transform)
 	if controller_transform != Transform3D.IDENTITY:
-		var xf := controller_transform
-		xf.origin.y = maxf(xf.origin.y, 0.0)
-		return xf
+		return hover_over_hand(controller_transform)
 	return _camera_preview_transform()
+
+
+static func hover_over_hand(
+	hand_transform: Transform3D,
+	up_m: float = HAND_HOVER_UP_M
+) -> Transform3D:
+	return Transform3D(Basis.IDENTITY, hand_transform.origin + Vector3(0.0, up_m, 0.0))
 
 
 func _camera_preview_transform() -> Transform3D:
@@ -260,7 +325,9 @@ static func surface_size_from_anchor(anchor: Node3D) -> Vector3:
 static func table_place_offset(
 	surface_height_m: float,
 	table_size: Vector3,
-	toward_flat: Vector3
+	toward_flat: Vector3,
+	offset_right: float = 0.25,
+	offset_toward: float = 0.20
 ) -> Vector3:
 	var toward := toward_flat
 	toward.y = 0.0
@@ -269,15 +336,15 @@ static func table_place_offset(
 	else:
 		toward = toward.normalized()
 	var right := Vector3(toward.z, 0.0, -toward.x)
-	var world := right * (table_size.x * TABLE_OFFSET_RIGHT)
-	world += toward * (table_size.z * TABLE_OFFSET_TOWARD)
+	var world := right * (table_size.x * offset_right)
+	world += toward * (table_size.z * offset_toward)
 	return Vector3(world.x, surface_height_m, world.z)
 
 
 static func attach_farm_to_anchor(
 	farm_root: Node3D,
 	anchor: Node3D,
-	marker_offset_y: float = MARKER_SURFACE_OFFSET_Y,
+	marker_offset_y: float = 0.0375,
 	local_origin: Vector3 = Vector3.ZERO
 ) -> void:
 	if farm_root.get_parent() != anchor:
@@ -301,4 +368,4 @@ static func lock_farm_at_transform(
 		farm_root.transform = world_transform
 	var marker: Node3D = farm_root.get_node_or_null("Marker") as Node3D
 	if marker != null:
-		marker.position = Vector3(0.0, MARKER_SURFACE_OFFSET_Y, 0.0)
+		marker.position = Vector3(0.0, 0.0375, 0.0)

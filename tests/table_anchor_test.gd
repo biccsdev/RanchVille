@@ -139,6 +139,17 @@ func test_table_place_offset_moves_right_and_toward_user() -> void:
 	assert_vector(offset).is_equal(Vector3(0.25, 0.35, 0.20))
 
 
+func test_table_place_offset_toward_only_moves_world_z() -> void:
+	var offset: Vector3 = _TableAnchorScript.table_place_offset(
+		0.0,
+		Vector3(1.0, 0.0, 1.0),
+		Vector3(0.0, 0.0, 1.0),
+		0.0,
+		0.5
+	)
+	assert_vector(offset).is_equal(Vector3(0.0, 0.0, 0.5))
+
+
 func test_aabb_top_is_table_surface_height() -> void:
 	var box := AABB(Vector3(-0.4, -0.35, -0.3), Vector3(0.8, 0.7, 0.6))
 	assert_vector(Vector3(_TableSurfaceScript.height_from_aabb(box), 0.0, 0.0)).is_equal(
@@ -162,6 +173,72 @@ func test_attach_farm_raises_to_table_surface() -> void:
 
 	assert_vector(farm.position).is_equal(Vector3(0.0, 0.35, 0.0))
 	assert_vector(marker.position).is_equal(Vector3(0.0, 0.0375, 0.0))
+
+
+func test_ensure_placed_anchor_recovers_farm_parent() -> void:
+	var world := Node3D.new()
+	auto_free(world)
+	var table := Node3D.new()
+	world.add_child(table)
+	var farm := Node3D.new()
+	table.add_child(farm)
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor._farm_root = farm
+	anchor._world_root = world
+	anchor._placed_anchor = null
+	anchor._ensure_placed_anchor()
+	assert_object(anchor._placed_anchor).is_same(table)
+
+
+func test_apply_placed_table_pose_uses_current_offset() -> void:
+	var world := Node3D.new()
+	auto_free(world)
+	var table := Node3D.new()
+	world.add_child(table)
+	var farm := Node3D.new()
+	var marker := MeshInstance3D.new()
+	marker.name = "Marker"
+	farm.add_child(marker)
+	world.add_child(farm)
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor._farm_root = farm
+	anchor._placed_anchor = table
+	anchor._placed_toward = Vector3(0.0, 0.0, 1.0)
+	anchor.table_offset_right = 0.25
+	anchor.table_offset_toward = 0.20
+	anchor._apply_placed_table_pose()
+	assert_vector(farm.position).is_equal_approx(
+		Vector3(0.2, 0.0, 0.12),
+		Vector3(0.001, 0.001, 0.001)
+	)
+
+
+func test_hover_over_hand_raises_world_up() -> void:
+	var xf := Transform3D(Basis.IDENTITY, Vector3(1.0, 0.5, 2.0))
+	var hover: Transform3D = _TableAnchorScript.hover_over_hand(xf, 0.08)
+	assert_vector(hover.origin).is_equal(Vector3(1.0, 0.58, 2.0))
+
+
+func test_preview_uses_xr_node_tracking_api() -> void:
+	var text := FileAccess.get_file_as_string(_TABLE_ANCHOR_SCRIPT)
+	assert_str(text).contains("get_is_active")
+	assert_str(text).contains("get_has_tracking_data")
+	assert_bool(text.contains(".is_active(")).is_false()
+
+
+func test_style_marker_uses_unshaded_override() -> void:
+	var farm := Node3D.new()
+	auto_free(farm)
+	var marker := MeshInstance3D.new()
+	marker.name = "Marker"
+	farm.add_child(marker)
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor._farm_root = farm
+	anchor._style_marker()
+	assert_object(marker.material_override).is_not_null()
 
 
 func test_no_table_timeout_in_seeking_enters_manual() -> void:
