@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="CropData" load_steps=8 format=3 uid="uid://bic24wheatcrop001"]
+
+[ext_resource type="Script" path="res://scripts/farm/crop_data.gd" id="1_crop_data"]
+[ext_resource type="Script" path="res://scripts/farm/crop_stage.gd" id="2_crop_stage"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_seed"]
+size = Vector3(0.08, 0.04, 0.08)
+
+[sub_resource type="SphereMesh" id="SphereMesh_sprout"]
+radius = 0.06
+height = 0.12
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ready"]
+top_radius = 0.05
+bottom_radius = 0.05
+height = 0.2
+
+[sub_resource type="Resource" id="CropStage_seed"]
+script = ExtResource("2_crop_stage")
+id = &"seed"
+duration_sec = 2.0
+mesh = SubResource("BoxMesh_seed")
+harvest_ready = false
+
+[sub_resource type="Resource" id="CropStage_sprout"]
+script = ExtResource("2_crop_stage")
+id = &"sprout"
+duration_sec = 2.0
+mesh = SubResource("SphereMesh_sprout")
+harvest_ready = false
+
+[sub_resource type="Resource" id="CropStage_ready"]
+script = ExtResource("2_crop_stage")
+id = &"harvest_ready"
+duration_sec = 2.0
+mesh = SubResource("CylinderMesh_ready")
+harvest_ready = true
+
+[resource]
+script = ExtResource("1_crop_data")
+crop_id = &"wheat"
+stages = [SubResource("CropStage_seed"), SubResource("CropStage_sprout"), SubResource("CropStage_ready")]
