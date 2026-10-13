@@ -3,6 +3,11 @@
 [ext_resource type="Script" uid="uid://0be8hm45m8u3" path="res://scripts/xr_bootstrap.gd" id="1_bootstrap"]
 [ext_resource type="Script" uid="uid://p7qbwvgu631h" path="res://scripts/xr/table_anchor.gd" id="2_table_anchor"]
 [ext_resource type="PackedScene" path="res://scenes/table_surface.tscn" id="3_table_surface"]
+[ext_resource type="Script" uid="uid://bbd0yce2stdb7" path="res://scripts/xr/hand_input_xr.gd" id="4_hand_input_xr"]
+[ext_resource type="Script" uid="uid://ky7rsmb1v1fc" path="res://scripts/grab/grab_system.gd" id="5_grab_system"]
+[ext_resource type="PackedScene" path="res://scenes/debug_grabbable.tscn" id="6_debug_grabbable"]
+[ext_resource type="Script" uid="uid://bjchbt1cfrsfq" path="res://scripts/xr/hand_interaction_point.gd" id="7_interaction_point"]
+[ext_resource type="PackedScene" path="res://scenes/debug_grabbable_green.tscn" id="8_debug_grabbable_green"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_marker"]
 size = Vector3(0.075, 0.075, 0.075)
@@ -26,9 +31,24 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 tracker = &"right_hand"
 pose = &"grip"
 
+[node name="InteractionPoint" type="Node3D" parent="XROrigin3D/RightHand" unique_id=853485237]
+script = ExtResource("7_interaction_point")
+
 [node name="LeftHand" type="XRController3D" parent="XROrigin3D" unique_id=1693494274]
 tracker = &"left_hand"
 pose = &"grip"
+
+[node name="InteractionPoint" type="Node3D" parent="XROrigin3D/LeftHand" unique_id=1841203021]
+script = ExtResource("7_interaction_point")
+side = &"left"
+
+[node name="LeftHandTracked" type="XRNode3D" parent="XROrigin3D"]
+tracker = &"/user/hand_tracker/left"
+pose = &"default"
+
+[node name="RightHandTracked" type="XRNode3D" parent="XROrigin3D"]
+tracker = &"/user/hand_tracker/right"
+pose = &"default"
 
 [node name="OpenXRFbSceneManager" type="OpenXRFbSceneManager" parent="XROrigin3D" unique_id=1592520967]
 scenes/table = ExtResource("3_table_surface")
@@ -39,8 +59,23 @@ scenes/table = ExtResource("3_table_surface")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0375, 0)
 mesh = SubResource("BoxMesh_marker")
 
+[node name="DebugGrabbable" parent="FarmRoot" unique_id=1220055054 instance=ExtResource("6_debug_grabbable")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0, 0)
+
+[node name="DebugGrabbable2" parent="FarmRoot" instance=ExtResource("8_debug_grabbable_green")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0, 0)
+
 [node name="TableAnchor" type="Node" parent="." unique_id=201104749]
 script = ExtResource("2_table_anchor")
+
+[node name="HandInputXr" type="Node" parent="." unique_id=307122561]
+script = ExtResource("4_hand_input_xr")
+
+[node name="GrabSystem" type="Node" parent="." unique_id=887279063]
+script = ExtResource("5_grab_system")
+left_hand_holder = NodePath("../XROrigin3D/LeftHand/InteractionPoint")
+right_hand_holder = NodePath("../XROrigin3D/RightHand/InteractionPoint")
+table_anchor = NodePath("../TableAnchor")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=454710415]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 4, 0)

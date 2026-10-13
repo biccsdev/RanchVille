@@ -77,3 +77,56 @@ func test_project_enables_meta_scene_api() -> void:
 	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
 	assert_str(text).contains("openxr/extensions/meta/scene_api=true")
 	assert_str(text).contains("openxr/extensions/meta/anchor_api=true")
+
+
+func test_project_registers_openxr_action_map() -> void:
+	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
+	assert_str(text).contains('openxr/action_map="res://openxr_action_map.tres"')
+	assert_file("res://openxr_action_map.tres").is_file()
+
+
+func test_project_enables_openxr_hand_interaction() -> void:
+	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
+	assert_str(text).contains("openxr/extensions/hand_tracking=true")
+	assert_str(text).contains("openxr/extensions/hand_tracking_unobstructed_data_source=true")
+	assert_str(text).contains("openxr/extensions/hand_tracking_controller_data_source=true")
+	assert_str(text).contains("openxr/extensions/hand_interaction_profile=true")
+	var action_map := FileAccess.get_file_as_string("res://openxr_action_map.tres")
+	assert_str(action_map).contains("/interaction_profiles/ext/hand_interaction_ext")
+	assert_str(action_map).contains("/interaction_profiles/microsoft/hand_interaction")
+
+
+func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
+	var packed: PackedScene = load(_MAIN_SCENE) as PackedScene
+	var root: Node = auto_free(packed.instantiate())
+	assert_bool(root.has_node("GrabSystem")).is_true()
+	assert_bool(root.has_node("HandInputXr")).is_true()
+	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
+	assert_bool(farm_root.has_node("DebugGrabbable")).is_true()
+	assert_bool(farm_root.has_node("DebugGrabbable2")).is_true()
+	var green: Node = farm_root.get_node("DebugGrabbable2")
+	assert_str(green.scene_file_path).is_equal("res://scenes/debug_grabbable_green.tscn")
+	var xr_script: Script = root.get_node("HandInputXr").get_script()
+	assert_str(xr_script.source_code).contains("../XROrigin3D/RightHand")
+	assert_bool(xr_script.source_code.contains("PinchDetector")).is_false()
+	assert_bool(xr_script.source_code.contains("HAND_JOINT")).is_false()
+	var origin: XROrigin3D = root.get_node("XROrigin3D") as XROrigin3D
+	var left_tracked: XRNode3D = origin.get_node("LeftHandTracked") as XRNode3D
+	var right_tracked: XRNode3D = origin.get_node("RightHandTracked") as XRNode3D
+	assert_object(left_tracked).is_not_null()
+	assert_object(right_tracked).is_not_null()
+	assert_str(String(left_tracked.tracker)).is_equal("/user/hand_tracker/left")
+	assert_str(String(right_tracked.tracker)).is_equal("/user/hand_tracker/right")
+	assert_str(String(left_tracked.pose)).is_equal("default")
+	var point_script: Script = root.get_node("XROrigin3D/RightHand/InteractionPoint").get_script()
+	assert_str(point_script.source_code).contains("HandDetectMarker")
+	assert_str(point_script.source_code).contains("RightHandTracked")
+	assert_bool(point_script.source_code.contains("HAND_JOINT")).is_false()
+
+
+func test_debug_grabbable_uses_grabbable_script() -> void:
+	var packed: PackedScene = load("res://scenes/debug_grabbable.tscn") as PackedScene
+	var prop: Node = auto_free(packed.instantiate())
+	var script: Script = prop.get_script()
+	assert_object(script).is_not_null()
+	assert_str(script.resource_path).is_equal("res://scripts/grab/grabbable.gd")

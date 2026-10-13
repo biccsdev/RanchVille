@@ -100,9 +100,25 @@ flowchart LR
 - `pinch_ended`
 - `poke`
 
-**PinchDetector** (`scripts/input/pinch_detector.gd`) is headless-testable pure geometry: thumb-tip and index-tip `Vector3` positions in, pinched or not out. Threshold: `PinchDetector.PINCH_DISTANCE_M` (meters); pinched when tip distance is less than or equal to that value (inclusive boundary). `apply()` emits `pinch_started` / `pinch_ended` on **HandInput** only when state changes. A future XR adapter under `scripts/input/` will read joints and call `apply()`; it may use OpenXR. Controller trigger or grip maps to pinch start/end; a documented button or poke pose maps to `poke`. All gameplay code subscribes to **HandInput** only.
+**PinchDetector** (`scripts/input/pinch_detector.gd`) is headless-testable pure geometry: thumb-tip and index-tip `Vector3` positions in, pinched or not out. Threshold: `PinchDetector.PINCH_DISTANCE_M` (meters); pinched when tip distance is less than or equal to that value (inclusive boundary). `apply()` emits `pinch_started` / `pinch_ended` on **HandInput** only when state changes. Live XR does not use this detector. **HandInputXr** maps OpenXR `pinch_ext` / `grasp_ext` (trigger and grip actions). All gameplay code subscribes to **HandInput** only.
 
 Tests use a fake input helper that emits the same signals without a headset.
+
+**HandInput** also exposes `active_hand` (`&"left"` or `&"right"`). XR and fake sources set it before each pinch emit so grab logic knows which holder to use.
+
+**HandInputXr** (`scripts/xr/hand_input_xr.gd`) maps OpenXR actions on `XRController3D` (`trigger` / `trigger_click`, `grip` / `grip_click`) to **HandInput** pinch start/end. Hands use the same actions: the action map binds `pinch_ext`, `grasp_ext`, and Microsoft `select` / `squeeze` to those paths. `project.godot` enables `hand_interaction_profile` and the hand-tracking data sources. OpenXR types stay under `scripts/xr/` only.
+
+## Grab (BIC-19)
+
+**Grabbable** (`scripts/grab/grabbable.gd`) is a `Node3D` component (group `grabbable`). Export `grab_range_m` (default 0.28 m). `grab(holder)` reparents to the hand or controller holder and keeps world pose. `release()` restores the original parent and keeps world pose. No RigidBody physics in MVP.
+
+**GrabSelector** (`scripts/grab/grab_selector.gd`) is headless-testable: `pick_nearest(origin, range_m, nodes)` and `pick_nearest_grabbable(origin, nodes)` (per-object range from each **Grabbable**).
+
+**GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold.
+
+Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. Orange and green **Grabbable** cubes sit on FarmRoot. In-range targets show a solid yellow outline before pinch.
+
+**HandInteractionPoint** is a child of each `XRController3D` (grip pose) while a controller is in use. When `/user/hand_tracker/*` has optical data, it follows the sibling `XRNode3D` (`LeftHandTracked` / `RightHandTracked`, pose `default`). That is the official OpenXR hand pose. Grab parents to that point. A small sphere is cyan on optical hands, dim on the controller. `HandTrackerLookup` reads the official tracker. `project.godot` references `openxr_action_map.tres`.
 
 ## Table anchor and FarmRoot (BIC-18)
 
