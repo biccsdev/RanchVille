@@ -66,6 +66,14 @@ If `left_hand` / `right_hand` stay null, pinch never fires.
 Use `@onready` paths like `$"../XROrigin3D/RightHand"`.
 Select grab targets by group `grabbable`, not `get_script()` identity.
 
+## Hand grab uses OpenXR grip and pinch_ext only
+
+Do not compose index-tip position with palm rotation.
+Do not pinch from a 2 cm joint-distance test in gameplay.
+Parent grabs to `XRController3D` grip. Map `pinch_ext` / `grasp_ext`
+to trigger and grip in `openxr_action_map.tres`.
+`XRHandTracker` is only for a tracking indicator, not for pose.
+
 ## XRHandTracker names are /user/hand_tracker/left
 
 `XRController3D.tracker` is `left_hand` / `right_hand`.

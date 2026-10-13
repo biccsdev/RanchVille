@@ -97,10 +97,11 @@ func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	assert_str(green.scene_file_path).is_equal("res://scenes/debug_grabbable_green.tscn")
 	var xr_script: Script = root.get_node("HandInputXr").get_script()
 	assert_str(xr_script.source_code).contains("../XROrigin3D/RightHand")
-	var lookup := FileAccess.get_file_as_string("res://scripts/xr/hand_tracker_lookup.gd")
-	assert_str(lookup).contains("/user/hand_tracker/left")
+	assert_bool(xr_script.source_code.contains("PinchDetector")).is_false()
+	assert_bool(xr_script.source_code.contains("HAND_JOINT")).is_false()
 	var point_script: Script = root.get_node("XROrigin3D/RightHand/InteractionPoint").get_script()
 	assert_str(point_script.source_code).contains("HandDetectMarker")
+	assert_bool(point_script.source_code.contains("HAND_JOINT")).is_false()
 
 
 func test_debug_grabbable_uses_grabbable_script() -> void:
