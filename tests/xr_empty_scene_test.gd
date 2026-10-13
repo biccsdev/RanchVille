@@ -54,6 +54,7 @@ func test_bootstrap_enables_alpha_blend_passthrough() -> void:
 	var text := FileAccess.get_file_as_string(_BOOTSTRAP_SCRIPT)
 	assert_str(text).contains("XR_ENV_BLEND_MODE_ALPHA_BLEND")
 	assert_str(text).contains("transparent_bg")
+	assert_str(text).contains("session_begun")
 
 
 func test_xr_empty_has_farm_root_and_scene_manager() -> void:
@@ -71,3 +72,4 @@ func test_xr_empty_has_farm_root_and_scene_manager() -> void:
 func test_project_enables_meta_scene_api() -> void:
 	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
 	assert_str(text).contains("openxr/extensions/meta/scene_api=true")
+	assert_str(text).contains("openxr/extensions/meta/anchor_api=true")

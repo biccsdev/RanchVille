@@ -6,12 +6,17 @@ const _Picker := preload("res://scripts/xr/table_anchor_picker.gd")
 enum Mode { SEEKING, MANUAL, PLACED }
 
 const SETTLE_SEC := 1.0
+const NO_TABLE_SEC := 3.0
 const MARKER_SURFACE_OFFSET_Y := 0.15
+const SCENE_PERMISSION := "com.oculus.permission.USE_SCENE"
+const MANUAL_PREVIEW_FORWARD_M := 0.7
+const MANUAL_PREVIEW_DROP_M := 0.55
 
 var mode: Mode = Mode.SEEKING
 var _capture_requested := false
 var _table_candidates: Array[XRAnchor3D] = []
 var _settle_generation := 0
+var _no_table_generation := 0
 
 @onready var _farm_root: Node3D = $"../FarmRoot"
 @onready var _world_root: Node3D = get_parent()
@@ -23,6 +28,9 @@ var _settle_generation := 0
 
 
 func _ready() -> void:
+	if _farm_root != null:
+		_farm_root.visible = false
+
 	var hand_input: Node = get_node_or_null("/root/HandInput")
 	if hand_input != null:
 		hand_input.poke.connect(_on_hand_poke)
@@ -32,23 +40,22 @@ func _ready() -> void:
 			hand.button_pressed.connect(_on_controller_button_pressed.bind(hand))
 
 	if not _openxr_active():
-		mode = Mode.MANUAL
+		enter_manual_mode()
 		return
 
 	_scene_manager.openxr_fb_scene_anchor_created.connect(_on_scene_anchor_created)
 	_scene_manager.openxr_fb_scene_data_missing.connect(_on_scene_data_missing)
 	_scene_manager.openxr_fb_scene_capture_completed.connect(_on_scene_capture_completed)
 
-	_restart_settle_timer()
+	var xr_interface: XRInterface = XRServer.find_interface("OpenXR")
+	if xr_interface != null and not xr_interface.session_begun.is_connected(_on_session_begun):
+		xr_interface.session_begun.connect(_on_session_begun)
 
 
 func _process(_delta: float) -> void:
 	if mode != Mode.MANUAL:
 		return
-	var hand := _active_controller()
-	if hand == null:
-		return
-	_farm_root.global_transform = _manual_preview_transform(hand.global_transform)
+	_farm_root.global_transform = _manual_preview_transform()
 
 
 func _openxr_active() -> bool:
@@ -56,12 +63,27 @@ func _openxr_active() -> bool:
 	return xr_interface != null and xr_interface.is_initialized()
 
 
+func _on_session_begun() -> void:
+	if mode == Mode.PLACED:
+		return
+	_request_scene_permission()
+	if not _scene_manager.are_scene_anchors_created():
+		_scene_manager.create_scene_anchors()
+	_restart_no_table_timer()
+
+
+func _request_scene_permission() -> void:
+	if OS.get_name() != "Android":
+		return
+	OS.request_permission(SCENE_PERMISSION)
+
+
 func _active_controller() -> XRController3D:
 	if _right_hand != null and _right_hand.is_active():
 		return _right_hand
 	if _left_hand != null and _left_hand.is_active():
 		return _left_hand
-	return _right_hand if _right_hand != null else _left_hand
+	return null
 
 
 func _on_scene_anchor_created(_scene_node: Object, spatial_entity: OpenXRFbSpatialEntity) -> void:
@@ -86,6 +108,15 @@ func _restart_settle_timer() -> void:
 	timer.timeout.connect(func() -> void: _on_settle_timeout(generation))
 
 
+func _restart_no_table_timer() -> void:
+	if not is_inside_tree():
+		return
+	_no_table_generation += 1
+	var generation := _no_table_generation
+	var timer := get_tree().create_timer(NO_TABLE_SEC)
+	timer.timeout.connect(func() -> void: _on_no_table_timeout(generation))
+
+
 func _on_settle_timeout(generation: int) -> void:
 	if generation != _settle_generation:
 		return
@@ -101,6 +132,15 @@ func _on_settle_timeout(generation: int) -> void:
 	var chosen := _Picker.pick_nearest(_camera.global_position, nodes) as XRAnchor3D
 	if chosen != null:
 		place_on_table(chosen)
+
+
+func _on_no_table_timeout(generation: int) -> void:
+	if generation != _no_table_generation:
+		return
+	if mode != Mode.SEEKING:
+		return
+	if _table_candidates.is_empty():
+		enter_manual_mode()
 
 
 func _on_scene_data_missing() -> void:
@@ -126,7 +166,7 @@ func _on_scene_capture_completed(success: bool) -> void:
 		_scene_manager.remove_scene_anchors()
 	_table_candidates.clear()
 	_scene_manager.create_scene_anchors()
-	_restart_settle_timer()
+	_restart_no_table_timer()
 
 
 func _on_controller_button_pressed(name: StringName, hand: XRController3D) -> void:
@@ -137,30 +177,54 @@ func _on_controller_button_pressed(name: StringName, hand: XRController3D) -> vo
 func _on_hand_poke() -> void:
 	if mode != Mode.MANUAL:
 		return
-	var hand := _active_controller()
-	if hand == null:
-		return
-	confirm_manual(hand.global_transform)
+	confirm_manual(_manual_preview_transform())
 
 
 func enter_manual_mode() -> void:
 	mode = Mode.MANUAL
+	if _farm_root != null:
+		_farm_root.visible = true
 
 
 func place_on_table(anchor: XRAnchor3D) -> void:
 	attach_farm_to_anchor(_farm_root, anchor, MARKER_SURFACE_OFFSET_Y)
+	if _farm_root != null:
+		_farm_root.visible = true
 	mode = Mode.PLACED
 
 
-func confirm_manual(controller_transform: Transform3D) -> void:
-	lock_farm_at_transform(_farm_root, _world_root, _manual_preview_transform(controller_transform))
+func confirm_manual(world_transform: Transform3D) -> void:
+	lock_farm_at_transform(_farm_root, _world_root, world_transform)
+	if _farm_root != null:
+		_farm_root.visible = true
 	mode = Mode.PLACED
 
 
-func _manual_preview_transform(controller_transform: Transform3D) -> Transform3D:
-	var xf := controller_transform
-	xf.origin.y = maxf(xf.origin.y, 0.0)
-	return xf
+func _manual_preview_transform(controller_transform: Transform3D = Transform3D.IDENTITY) -> Transform3D:
+	var hand := _active_controller()
+	if hand != null:
+		var xf := hand.global_transform
+		xf.origin.y = maxf(xf.origin.y, 0.0)
+		return xf
+	if controller_transform != Transform3D.IDENTITY:
+		var xf := controller_transform
+		xf.origin.y = maxf(xf.origin.y, 0.0)
+		return xf
+	return _camera_preview_transform()
+
+
+func _camera_preview_transform() -> Transform3D:
+	if _camera == null:
+		return Transform3D.IDENTITY
+	var forward := -_camera.global_transform.basis.z
+	forward.y = 0.0
+	if forward.length_squared() < 0.0001:
+		forward = Vector3(0.0, 0.0, -1.0)
+	else:
+		forward = forward.normalized()
+	var origin := _camera.global_position + forward * MANUAL_PREVIEW_FORWARD_M
+	origin.y = maxf(_camera.global_position.y - MANUAL_PREVIEW_DROP_M, 0.0)
+	return Transform3D(Basis.IDENTITY, origin)
 
 
 static func attach_farm_to_anchor(

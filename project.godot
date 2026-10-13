@@ -35,3 +35,4 @@ openxr/extensions/hand_tracking=true
 shaders/enabled=true
 openxr/extensions/meta/passthrough=true
 openxr/extensions/meta/scene_api=true
+openxr/extensions/meta/anchor_api=true

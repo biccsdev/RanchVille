@@ -120,3 +120,19 @@ func test_xr_scripts_do_not_reference_openxr_in_farm_or_input() -> void:
 func test_table_anchor_scripts_live_under_xr_folder() -> void:
 	assert_file(_TABLE_ANCHOR_SCRIPT).is_file()
 	assert_file(_TABLE_ANCHOR_PICKER_SCRIPT).is_file()
+
+
+func test_table_anchor_waits_for_session_before_no_table_fallback() -> void:
+	var text := FileAccess.get_file_as_string(_TABLE_ANCHOR_SCRIPT)
+	assert_str(text).contains("session_begun")
+	assert_str(text).contains("NO_TABLE_SEC")
+	assert_str(text).contains("USE_SCENE")
+
+
+func test_no_table_timeout_in_seeking_enters_manual() -> void:
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor.mode = _TableAnchorScript.Mode.SEEKING
+	anchor._no_table_generation = 4
+	anchor._on_no_table_timeout(4)
+	assert_int(anchor.mode).is_equal(_TableAnchorScript.Mode.MANUAL)

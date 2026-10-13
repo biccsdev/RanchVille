@@ -34,9 +34,10 @@ pose = &"grip"
 scenes/table = ExtResource("3_table_surface")
 
 [node name="FarmRoot" type="Node3D" parent="."]
+visible = false
 
 [node name="Marker" type="MeshInstance3D" parent="FarmRoot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 mesh = SubResource("BoxMesh_marker")
 
 [node name="TableAnchor" type="Node" parent="."]
