@@ -1,20 +1,18 @@
-# BIC-24 — Crop growth stages, data-driven and unit-tested
+# BIC-16 — Hand tracking pinch detection with unit-tested thresholds
 
 ## Checklist
 
 - [x] Create branch from `origin/main`
-- [x] Add `CropStage`, `CropData`, `wheat_crop.tres`
-- [x] Add `FakeClock`, `CropGrowth`
-- [x] Add `tests/crop_growth_test.gd`
+- [x] Add `PinchDetector` with `PINCH_DISTANCE_M` and `apply()`
+- [x] Add `tests/pinch_detector_test.gd`
 - [x] Run `./run_headless_tests.sh`
 - [x] Update `ARCHITECTURE.md`
 - [x] Open PR
-- [x] Move BIC-24 to **In Review**
-- [x] PR merged; BIC-24 **Done**
+- [x] Move BIC-16 to **In Review**
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-24-crop-growth-stages-data-driven-and-unit-tested` (merged)
-- **PR:** https://github.com/biccsdev/RanchVille/pull/12
-- **Headless:** 37/37 passed (local Godot 4.7.2)
-- **Linear:** Done
+- **Branch:** `comprasvictortorres/bic-16-hand-tracking-pinch-detection-with-unit-tested-thresholds`
+- **PR:** https://github.com/biccsdev/RanchVille/pull/13
+- **Headless:** 45/45 passed (Godot 4.7.2; gdUnit exit 0; OpenXR addon crash on editor shutdown only)
+- **Linear:** In Review

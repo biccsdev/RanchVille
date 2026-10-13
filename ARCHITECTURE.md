@@ -100,7 +100,7 @@ flowchart LR
 - `pinch_ended`
 - `poke`
 
-Hand tracking reads joints and runs a pinch detector (joint positions in, pinched or not out). Thresholds live in a constant or resource, not magic numbers in scenes. Controller trigger or grip maps to pinch start/end; a documented button or poke pose maps to `poke`. XR adapters live under `scripts/input/` and may use OpenXR. All gameplay code subscribes to **HandInput** only.
+**PinchDetector** (`scripts/input/pinch_detector.gd`) is headless-testable pure geometry: thumb-tip and index-tip `Vector3` positions in, pinched or not out. Threshold: `PinchDetector.PINCH_DISTANCE_M` (meters); pinched when tip distance is less than or equal to that value (inclusive boundary). `apply()` emits `pinch_started` / `pinch_ended` on **HandInput** only when state changes. A future XR adapter under `scripts/input/` will read joints and call `apply()`; it may use OpenXR. Controller trigger or grip maps to pinch start/end; a documented button or poke pose maps to `poke`. All gameplay code subscribes to **HandInput** only.
 
 Tests use a fake input helper that emits the same signals without a headset.
 
