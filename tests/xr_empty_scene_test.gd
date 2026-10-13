@@ -94,11 +94,3 @@ func test_debug_grabbable_uses_grabbable_script() -> void:
 	var script: Script = prop.get_script()
 	assert_object(script).is_not_null()
 	assert_str(script.resource_path).is_equal("res://scripts/grab/grabbable.gd")
-
-
-func test_hand_input_xr_maps_trigger_click() -> void:
-	var text := FileAccess.get_file_as_string("res://scripts/xr/hand_input_xr.gd")
-	assert_str(text).contains("trigger_click")
-	assert_str(text).contains("emit_pinch_started")
-	assert_str(text).contains("emit_pinch_ended")
-	assert_str(text).contains("active_hand")

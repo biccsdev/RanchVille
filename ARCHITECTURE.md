@@ -27,8 +27,6 @@ Planned subfolders (created when their issues land; not required for BIC-12):
 | Path | Role |
 |------|------|
 | `scripts/input/` | `HandInput`, fake input, pinch detector, controller mapping |
-| `scripts/grab/` | `Grabbable`, `GrabSelector`, `GrabSystem` |
-| `scripts/xr/` | Table anchor, XR bootstrap, `HandInputXr` |
 | `scripts/farm/` | Soil tile state machine, `CropGrowth`, `FakeClock` |
 | `scripts/economy/` | `CoinManager` |
 | `scripts/save/` | Versioned JSON save/load |

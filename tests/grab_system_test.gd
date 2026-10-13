@@ -7,10 +7,6 @@ const _FakeHandInputScript := preload("res://scripts/input/fake_hand_input.gd")
 const _TableAnchorScript := preload("res://scripts/xr/table_anchor.gd")
 
 
-class FakeAnchor extends Node:
-	var mode := 0
-
-
 func _wire_scene() -> Dictionary:
 	var world := Node3D.new()
 	auto_free(world)
@@ -90,7 +86,7 @@ func test_left_pinch_end_does_not_release_right_hand_hold() -> void:
 
 func test_grab_blocked_until_table_placed() -> void:
 	var ctx := _wire_scene()
-	var anchor := FakeAnchor.new()
+	var anchor: Node = _TableAnchorScript.new()
 	auto_free(anchor)
 	anchor.mode = _TableAnchorScript.Mode.MANUAL
 	ctx["grab_system"].table_anchor = anchor

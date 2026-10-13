@@ -1,5 +1,11 @@
 # Lessons
 
+## Do not start the next Linear issue on a merge note
+
+When the user says a device test passed and a PR merged, only close that issue.
+Do not pick the next BIC. Another chat may already own it.
+Before any new issue work, check Linear status and the current git branch.
+
 ## Quest live reload is not Cursor-to-headset
 
 Do not tell the user that `./run_quest_live.sh` starts the game on Quest.

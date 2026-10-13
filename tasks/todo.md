@@ -14,6 +14,6 @@
 
 - **Branch:** `comprasvictortorres/bic-19-grabbable-component-and-nearest-in-range-grab`
 - **PR:** https://github.com/biccsdev/RanchVille/pull/15
-- **Headless:** 88/88 passed (Godot 4.7.2; gdUnit exit 0)
-- **Linear:** In Progress
+- **Headless:** 86/86 passed (Godot 4.7.2; gdUnit exit 0)
+- **Linear:** In Review (Quest 3 steps in issue comment)
 - **Scene / project:** `scenes/xr_empty.tscn`, `scenes/debug_grabbable.tscn`
