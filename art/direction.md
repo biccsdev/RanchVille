@@ -72,7 +72,7 @@ Tomato (`#C24B3A`) is a named accent in the palette. Use it on fruit faces via Y
 
 ## Notes for follow-up issues
 
-- **BIC-14:** Prefer recolorable low-poly meshes, not baked-hue packs.
+- **BIC-14:** MVP packs are locked in [asset-shortlist.md](asset-shortlist.md): Quaternius Ultimate Crops, Kenney Survival Kit, Kenney Nature Kit. Farm meshes stay farm-only. Restaurant dishes need a later kitchen catalog.
 - **BIC-48:** Warm table lighting and optional day/night tint; passthrough stays visible.
 - **BIC-55 / BIC-65:** Use approved palette sets; seasonal themes swap `PaletteSet`, not meshes.
 
