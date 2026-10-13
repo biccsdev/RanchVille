@@ -70,9 +70,12 @@ Select grab targets by group `grabbable`, not `get_script()` identity.
 
 Do not compose index-tip position with palm rotation.
 Do not pinch from a 2 cm joint-distance test in gameplay.
-Parent grabs to `XRController3D` grip. Map `pinch_ext` / `grasp_ext`
-to trigger and grip in `openxr_action_map.tres`.
-`XRHandTracker` is only for a tracking indicator, not for pose.
+`XRController3D` `left_hand` / `right_hand` is the Touch controller.
+Optical hands are a separate tracker: `/user/hand_tracker/left|right`.
+Follow that pose with an `XRNode3D` child of `XROrigin3D`, pose `default`.
+Enable `openxr/extensions/hand_interaction_profile` or `pinch_ext` never binds.
+Also enable the unobstructed and controller hand-tracking data sources.
+Meta native OpenXR also uses `/interaction_profiles/microsoft/hand_interaction`.
 
 ## XRHandTracker names are /user/hand_tracker/left
 

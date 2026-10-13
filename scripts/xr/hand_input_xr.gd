@@ -27,8 +27,6 @@ func _update_pinch(side: StringName, hand: XRController3D) -> void:
 func _runtime_pinching(hand: XRController3D) -> bool:
 	if hand == null:
 		return false
-	if not hand.get_is_active() and not hand.get_has_tracking_data():
-		return false
 	if hand.is_button_pressed(&"trigger_click"):
 		return true
 	if hand.is_button_pressed(&"grip_click"):

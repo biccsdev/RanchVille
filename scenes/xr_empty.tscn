@@ -42,6 +42,14 @@ pose = &"grip"
 script = ExtResource("7_interaction_point")
 side = &"left"
 
+[node name="LeftHandTracked" type="XRNode3D" parent="XROrigin3D"]
+tracker = &"/user/hand_tracker/left"
+pose = &"default"
+
+[node name="RightHandTracked" type="XRNode3D" parent="XROrigin3D"]
+tracker = &"/user/hand_tracker/right"
+pose = &"default"
+
 [node name="OpenXRFbSceneManager" type="OpenXRFbSceneManager" parent="XROrigin3D" unique_id=1592520967]
 scenes/table = ExtResource("3_table_surface")
 

@@ -106,7 +106,7 @@ Tests use a fake input helper that emits the same signals without a headset.
 
 **HandInput** also exposes `active_hand` (`&"left"` or `&"right"`). XR and fake sources set it before each pinch emit so grab logic knows which holder to use.
 
-**HandInputXr** (`scripts/xr/hand_input_xr.gd`) maps OpenXR actions on `XRController3D` (`trigger` / `trigger_click`, `grip` / `grip_click`) to **HandInput** pinch start/end. Hands use the same actions: the action map binds `pinch_ext` and `grasp_ext` to those paths. OpenXR types stay under `scripts/xr/` only.
+**HandInputXr** (`scripts/xr/hand_input_xr.gd`) maps OpenXR actions on `XRController3D` (`trigger` / `trigger_click`, `grip` / `grip_click`) to **HandInput** pinch start/end. Hands use the same actions: the action map binds `pinch_ext`, `grasp_ext`, and Microsoft `select` / `squeeze` to those paths. `project.godot` enables `hand_interaction_profile` and the hand-tracking data sources. OpenXR types stay under `scripts/xr/` only.
 
 ## Grab (BIC-19)
 
@@ -118,7 +118,7 @@ Tests use a fake input helper that emits the same signals without a headset.
 
 Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. Orange and green **Grabbable** cubes sit on FarmRoot. In-range targets show a solid yellow outline before pinch.
 
-**HandInteractionPoint** is a child of each `XRController3D` at the OpenXR **grip** pose. Grab parents to that node. Pose and pinch come from the runtime only; we do not compose joints. A small sphere on the point is cyan when `/user/hand_tracker/*` reports data, dim when only the controller pose is live. `HandTrackerLookup` only reads that official tracker for the indicator. `project.godot` references `openxr_action_map.tres`.
+**HandInteractionPoint** is a child of each `XRController3D` (grip pose) while a controller is in use. When `/user/hand_tracker/*` has optical data, it follows the sibling `XRNode3D` (`LeftHandTracked` / `RightHandTracked`, pose `default`). That is the official OpenXR hand pose. Grab parents to that point. A small sphere is cyan on optical hands, dim on the controller. `HandTrackerLookup` reads the official tracker. `project.godot` references `openxr_action_map.tres`.
 
 ## Table anchor and FarmRoot (BIC-18)
 

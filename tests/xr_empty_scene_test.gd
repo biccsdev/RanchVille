@@ -85,6 +85,17 @@ func test_project_registers_openxr_action_map() -> void:
 	assert_file("res://openxr_action_map.tres").is_file()
 
 
+func test_project_enables_openxr_hand_interaction() -> void:
+	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
+	assert_str(text).contains("openxr/extensions/hand_tracking=true")
+	assert_str(text).contains("openxr/extensions/hand_tracking_unobstructed_data_source=true")
+	assert_str(text).contains("openxr/extensions/hand_tracking_controller_data_source=true")
+	assert_str(text).contains("openxr/extensions/hand_interaction_profile=true")
+	var action_map := FileAccess.get_file_as_string("res://openxr_action_map.tres")
+	assert_str(action_map).contains("/interaction_profiles/ext/hand_interaction_ext")
+	assert_str(action_map).contains("/interaction_profiles/microsoft/hand_interaction")
+
+
 func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	var packed: PackedScene = load(_MAIN_SCENE) as PackedScene
 	var root: Node = auto_free(packed.instantiate())
@@ -99,8 +110,17 @@ func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	assert_str(xr_script.source_code).contains("../XROrigin3D/RightHand")
 	assert_bool(xr_script.source_code.contains("PinchDetector")).is_false()
 	assert_bool(xr_script.source_code.contains("HAND_JOINT")).is_false()
+	var origin: XROrigin3D = root.get_node("XROrigin3D") as XROrigin3D
+	var left_tracked: XRNode3D = origin.get_node("LeftHandTracked") as XRNode3D
+	var right_tracked: XRNode3D = origin.get_node("RightHandTracked") as XRNode3D
+	assert_object(left_tracked).is_not_null()
+	assert_object(right_tracked).is_not_null()
+	assert_str(String(left_tracked.tracker)).is_equal("/user/hand_tracker/left")
+	assert_str(String(right_tracked.tracker)).is_equal("/user/hand_tracker/right")
+	assert_str(String(left_tracked.pose)).is_equal("default")
 	var point_script: Script = root.get_node("XROrigin3D/RightHand/InteractionPoint").get_script()
 	assert_str(point_script.source_code).contains("HandDetectMarker")
+	assert_str(point_script.source_code).contains("RightHandTracked")
 	assert_bool(point_script.source_code.contains("HAND_JOINT")).is_false()
 
 

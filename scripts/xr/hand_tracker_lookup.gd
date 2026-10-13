@@ -20,4 +20,8 @@ static func get_hand(side: StringName) -> XRHandTracker:
 
 static func has_optical_tracking(side: StringName) -> bool:
 	var hand := get_hand(side)
-	return hand != null and hand.has_tracking_data
+	if hand == null or not hand.has_tracking_data:
+		return false
+	if hand.hand_tracking_source == XRHandTracker.HAND_TRACKING_SOURCE_CONTROLLER:
+		return false
+	return true

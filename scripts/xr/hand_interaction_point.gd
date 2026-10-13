@@ -7,10 +7,12 @@ const _Lookup := preload("res://scripts/xr/hand_tracker_lookup.gd")
 
 var _marker: MeshInstance3D
 var _marker_mat: StandardMaterial3D
+var _hand_node: XRNode3D
 
 
 func _ready() -> void:
 	position = Vector3.ZERO
+	_hand_node = _find_hand_node()
 	_marker_mat = StandardMaterial3D.new()
 	_marker_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_marker_mat.no_depth_test = true
@@ -25,7 +27,29 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	_update_marker_color(_Lookup.has_optical_tracking(side))
+	var optical := _Lookup.has_optical_tracking(side)
+	if optical and _hand_node != null and _hand_node.get_has_tracking_data():
+		global_transform = _hand_node.global_transform
+	else:
+		transform = Transform3D.IDENTITY
+	_update_marker_color(optical)
+
+
+func _find_hand_node() -> XRNode3D:
+	var origin := _xr_origin()
+	if origin == null:
+		return null
+	var node_name := "LeftHandTracked" if side == &"left" else "RightHandTracked"
+	return origin.get_node_or_null(node_name) as XRNode3D
+
+
+func _xr_origin() -> XROrigin3D:
+	var n: Node = self
+	while n != null:
+		if n is XROrigin3D:
+			return n as XROrigin3D
+		n = n.get_parent()
+	return null
 
 
 func _update_marker_color(hand_tracked: bool) -> void:
