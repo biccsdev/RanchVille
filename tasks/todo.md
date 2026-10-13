@@ -10,10 +10,11 @@
 - [x] Update `ARCHITECTURE.md`
 - [x] Open PR
 - [x] Move BIC-24 to **In Review**
+- [x] PR merged; BIC-24 **Done**
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-24-crop-growth-stages-data-driven-and-unit-tested`
+- **Branch:** `comprasvictortorres/bic-24-crop-growth-stages-data-driven-and-unit-tested` (merged)
 - **PR:** https://github.com/biccsdev/RanchVille/pull/12
 - **Headless:** 37/37 passed (local Godot 4.7.2)
-- **Linear:** In Review
+- **Linear:** Done
