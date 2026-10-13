@@ -5,7 +5,6 @@ const _GrabSelector := preload("res://scripts/grab/grab_selector.gd")
 
 @export var left_hand_holder: Node3D
 @export var right_hand_holder: Node3D
-@export var table_anchor: Node
 
 var _held: Dictionary = {}
 
@@ -16,8 +15,6 @@ func _ready() -> void:
 		left_hand_holder = get_node_or_null("../XROrigin3D/LeftHand/InteractionPoint") as Node3D
 	if right_hand_holder == null:
 		right_hand_holder = get_node_or_null("../XROrigin3D/RightHand/InteractionPoint") as Node3D
-	if table_anchor == null:
-		table_anchor = get_node_or_null("../TableAnchor")
 	var hand_input: Node = get_node_or_null("/root/HandInput")
 	if hand_input == null:
 		return
@@ -25,10 +22,6 @@ func _ready() -> void:
 		hand_input.pinch_started.connect(_on_pinch_started)
 	if not hand_input.pinch_ended.is_connected(_on_pinch_ended):
 		hand_input.pinch_ended.connect(_on_pinch_ended)
-
-
-func _grab_enabled() -> bool:
-	return true
 
 
 func _holder_for_hand(hand: StringName) -> Node3D:
@@ -44,17 +37,16 @@ func _process(_delta: float) -> void:
 func _update_grab_highlights() -> void:
 	var candidates: Array = get_tree().get_nodes_in_group(&"grabbable")
 	var show: Dictionary = {}
-	if _grab_enabled():
-		for hand in [&"left", &"right"]:
-			if _held.has(hand):
-				continue
-			var holder := _holder_for_hand(hand)
-			if holder == null:
-				continue
-			var origin := holder.global_position if holder.is_inside_tree() else holder.position
-			var target := _GrabSelector.pick_nearest_grabbable(origin, candidates)
-			if target != null:
-				show[target] = true
+	for hand in [&"left", &"right"]:
+		if _held.has(hand):
+			continue
+		var holder := _holder_for_hand(hand)
+		if holder == null:
+			continue
+		var origin := holder.global_position if holder.is_inside_tree() else holder.position
+		var target := _GrabSelector.pick_nearest_grabbable(origin, candidates)
+		if target != null:
+			show[target] = true
 	for item: Variant in candidates:
 		if item == null or not is_instance_valid(item):
 			continue
@@ -64,8 +56,6 @@ func _update_grab_highlights() -> void:
 
 
 func _on_pinch_started() -> void:
-	if not _grab_enabled():
-		return
 	var hand_input: Node = get_node_or_null("/root/HandInput")
 	if hand_input == null:
 		return

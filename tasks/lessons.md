@@ -82,14 +82,14 @@ Meta native OpenXR also uses `/interaction_profiles/microsoft/hand_interaction`.
 `XRController3D.tracker` is `left_hand` / `right_hand`.
 `XRServer.get_tracker("right_hand")` is not an `XRHandTracker`.
 OpenXR registers `/user/hand_tracker/left` and `/user/hand_tracker/right`.
-Look those names up for joint pinch and the index-tip grab point.
+Follow those trackers with `XRNode3D` pose `default`. Do not pinch from joints.
 A small sphere on `HandInteractionPoint` shows tracking: cyan = hands, dim = controller.
 
 ## Godot 4.7 index tip joint is HAND_JOINT_INDEX_FINGER_TIP
 
 `HAND_JOINT_INDEX_TIP` does not exist. Numeric `8` is an intermediate phalanx.
-Use `XRHandTracker.HAND_JOINT_INDEX_FINGER_TIP` (10).
-Convert joint origin through `XROrigin3D.to_global()`.
+The joint name is `XRHandTracker.HAND_JOINT_INDEX_FINGER_TIP` (10).
+Live grab does not use this joint. Keep the name here so we do not reuse `8`.
 
 ## Small Deploy crashes Quest 3
 

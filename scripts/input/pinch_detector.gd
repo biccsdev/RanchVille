@@ -7,7 +7,7 @@ const PINCH_DISTANCE_M := 0.02
 var _was_pinched: bool = false
 
 
-## Future XR sources pass HAND_JOINT_THUMB_TIP and HAND_JOINT_INDEX_TIP positions here.
+## Headless tests pass tip positions here. Live XR does not use this detector.
 func is_pinched(thumb_tip: Vector3, index_tip: Vector3) -> bool:
 	return thumb_tip.distance_to(index_tip) <= PINCH_DISTANCE_M
 

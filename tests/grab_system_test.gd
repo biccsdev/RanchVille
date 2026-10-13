@@ -4,7 +4,6 @@ extends GdUnitTestSuite
 const _GrabSystemScript := preload("res://scripts/grab/grab_system.gd")
 const _GrabbableScript := preload("res://scripts/grab/grabbable.gd")
 const _FakeHandInputScript := preload("res://scripts/input/fake_hand_input.gd")
-const _TableAnchorScript := preload("res://scripts/xr/table_anchor.gd")
 
 
 func _wire_scene() -> Dictionary:
@@ -27,7 +26,6 @@ func _wire_scene() -> Dictionary:
 	var grab_system: Node = _GrabSystemScript.new()
 	grab_system.left_hand_holder = left
 	grab_system.right_hand_holder = right
-	grab_system.table_anchor = null
 	world.add_child(grab_system)
 	var hand_input: Node = get_node("/root/HandInput")
 	var fake: RefCounted = _FakeHandInputScript.new(hand_input)
@@ -60,7 +58,6 @@ func test_pinch_ignores_out_of_range_only() -> void:
 	world.add_child(only)
 	var grab_system: Node = _GrabSystemScript.new()
 	grab_system.right_hand_holder = right
-	grab_system.table_anchor = null
 	world.add_child(grab_system)
 	var fake: RefCounted = _FakeHandInputScript.new(get_node("/root/HandInput"))
 	fake.pinch_start(&"right")
@@ -81,16 +78,6 @@ func test_left_pinch_end_does_not_release_right_hand_hold() -> void:
 	ctx["fake"].pinch_start(&"right")
 	ctx["fake"].pinch_end(&"left")
 	assert_object(ctx["near"].get_parent()).is_same(ctx["right"])
-	assert_bool(ctx["near"].is_held()).is_true()
-
-
-func test_grab_works_while_table_seeking() -> void:
-	var ctx := _wire_scene()
-	var anchor: Node = _TableAnchorScript.new()
-	auto_free(anchor)
-	anchor.mode = _TableAnchorScript.Mode.SEEKING
-	ctx["grab_system"].table_anchor = anchor
-	ctx["fake"].pinch_start(&"right")
 	assert_bool(ctx["near"].is_held()).is_true()
 
 
