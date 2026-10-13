@@ -8,11 +8,12 @@
 - [x] Comment on [BIC-14](https://linear.app/biccs/issue/BIC-14) with path and recommendation
 - [x] Move BIC-14 to **In Review** (human approval; not Done)
 - [x] Lock MVP combo (Quaternius + Kenney Survival + Kenney Nature)
-- [ ] Open PR for shortlist docs
+- [x] Open PR for shortlist docs
 
 ## Review
 
 - **Branch:** `comprasvictortorres/bic-14-shortlist-low-poly-asset-packs-and-check-licenses`
+- **PR:** https://github.com/biccsdev/RanchVille/pull/9
 - **Decision:** MVP uses the three free packs. Restaurant kitchen art is Later.
 - **Deliverable:** `art/asset-shortlist.md`
 - **Out of scope:** import assets, spend money, Godot scenes
