@@ -8,12 +8,12 @@
 - [x] Add debug_grabbable.tscn and wire xr_empty.tscn
 - [x] Add/extend tests and ARCHITECTURE.md
 - [x] Run `./run_headless_tests.sh`
-- [ ] Open PR and move BIC-19 to **In Review** with Quest 3 steps
+- [x] Open PR and move BIC-19 to **In Review** with Quest 3 steps
 
 ## Review
 
 - **Branch:** `comprasvictortorres/bic-19-grabbable-component-and-nearest-in-range-grab`
-- **PR:** (pending)
-- **Headless:** 87/87 passed (Godot 4.7.2; gdUnit exit 0)
+- **PR:** https://github.com/biccsdev/RanchVille/pull/15
+- **Headless:** 88/88 passed (Godot 4.7.2; gdUnit exit 0)
 - **Linear:** In Progress
-- **Scene / project:** `scenes/xr_empty.tscn`, `scenes/debug_grabbable.tscn` (no `project.godot` change)
+- **Scene / project:** `scenes/xr_empty.tscn`, `scenes/debug_grabbable.tscn`
