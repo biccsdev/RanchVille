@@ -12,6 +12,8 @@ const _REQUIRED_SNIPPETS: PackedStringArray = [
 	"meta_xr_features/quest_3_support=true",
 	"meta_xr_features/hand_tracking=1",
 	"meta_xr_features/passthrough=2",
+	'com.oculus.permission.USE_SCENE',
+	"meta_xr_features/use_anchor_api=true",
 	'package/unique_name="com.biccs.ranchville"',
 	"gradle_build/export_format=0",
 	"gradle_build/export_format=1",

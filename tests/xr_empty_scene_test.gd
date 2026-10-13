@@ -54,3 +54,26 @@ func test_bootstrap_enables_alpha_blend_passthrough() -> void:
 	var text := FileAccess.get_file_as_string(_BOOTSTRAP_SCRIPT)
 	assert_str(text).contains("XR_ENV_BLEND_MODE_ALPHA_BLEND")
 	assert_str(text).contains("transparent_bg")
+	assert_str(text).contains("session_begun")
+
+
+func test_xr_empty_has_farm_root_and_scene_manager() -> void:
+	var packed: PackedScene = load(_MAIN_SCENE) as PackedScene
+	var root: Node = auto_free(packed.instantiate())
+	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
+	assert_object(farm_root).is_not_null()
+	assert_bool(farm_root.has_node("Marker")).is_true()
+	var marker: MeshInstance3D = farm_root.get_node("Marker") as MeshInstance3D
+	var box: BoxMesh = marker.mesh as BoxMesh
+	assert_object(box).is_not_null()
+	assert_vector(box.size).is_equal(Vector3(0.075, 0.075, 0.075))
+	var origin: XROrigin3D = root.get_node("XROrigin3D") as XROrigin3D
+	assert_bool(origin.has_node("OpenXRFbSceneManager")).is_true()
+	assert_bool(origin.has_node("RightHand")).is_true()
+	assert_bool(root.has_node("TableAnchor")).is_true()
+
+
+func test_project_enables_meta_scene_api() -> void:
+	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
+	assert_str(text).contains("openxr/extensions/meta/scene_api=true")
+	assert_str(text).contains("openxr/extensions/meta/anchor_api=true")

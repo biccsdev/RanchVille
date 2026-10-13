@@ -104,6 +104,14 @@ flowchart LR
 
 Tests use a fake input helper that emits the same signals without a headset.
 
+## Table anchor and FarmRoot (BIC-18)
+
+**FarmRoot** (`scenes/xr_empty.tscn`) is the play-space origin for soil tiles and props. Later gameplay parents under FarmRoot, not under the XR camera.
+
+**TableAnchor** (`scripts/xr/table_anchor.gd`) uses Meta **OpenXRFbSceneManager** when Scene API is enabled. If a `table` semantic label exists, FarmRoot parents to that scene anchor’s **XRAnchor3D** so the farm tracks the real surface. If scene data is missing, capture fails, or no table is found, **manual place mode** follows the active controller until the player confirms with trigger (or **HandInput** `poke`). Manual placement locks FarmRoot in world space on the scene root.
+
+**TableAnchorPicker** (`scripts/xr/table_anchor_picker.gd`) is headless-testable: table label matching and nearest-table choice. OpenXR types stay under `scripts/xr/` only; farm, economy, and input scripts do not import them.
+
 ## Headless-testable systems
 
 This is a hard rule:

@@ -12,6 +12,14 @@ func _ready() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	get_viewport().use_xr = true
 	_enable_passthrough(xr_interface)
+	if not xr_interface.session_begun.is_connected(_on_session_begun):
+		xr_interface.session_begun.connect(_on_session_begun)
+
+
+func _on_session_begun() -> void:
+	var xr_interface: XRInterface = XRServer.find_interface("OpenXR")
+	if xr_interface != null:
+		_enable_passthrough(xr_interface)
 
 
 func _enable_passthrough(xr_interface: XRInterface) -> void:
