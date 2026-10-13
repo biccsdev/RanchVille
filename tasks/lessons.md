@@ -52,6 +52,26 @@ instance. Recover the table from `FarmRoot.get_parent()` or the cube never moves
 A leftover `godot-mcp` Node process can hold the single client slot.
 Restarting the editor drops the Quest remote-debug session.
 
+## Do not replace FarmRoot Marker with a Grabbable instance
+
+`TableAnchor._style_marker()` casts `Marker` to `MeshInstance3D`.
+A packed `Grabbable` scene makes that cast null. Table restyle stops.
+The cube then sits at the extra mesh offset and looks off the table.
+Keep `Marker` as a `MeshInstance3D`. Put grab props beside it.
+
+## HandInputXr must resolve hands from the scene tree
+
+Godot can drop `@export` NodePaths on save.
+If `left_hand` / `right_hand` stay null, pinch never fires.
+Use `@onready` paths like `$"../XROrigin3D/RightHand"`.
+Select grab targets by group `grabbable`, not `get_script()` identity.
+
+## Godot 4.7 index tip joint is HAND_JOINT_INDEX_FINGER_TIP
+
+`HAND_JOINT_INDEX_TIP` does not exist. Numeric `8` is an intermediate phalanx.
+Use `XRHandTracker.HAND_JOINT_INDEX_FINGER_TIP` (10).
+Convert joint origin through `XROrigin3D.to_global()`.
+
 ## Small Deploy crashes Quest 3
 
 `--remote-fs localhost:6010` plus a stub APK can fail with:

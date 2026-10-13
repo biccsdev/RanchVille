@@ -33,9 +33,9 @@ func _setup_highlight() -> void:
 		_highlight.transform = mesh_node.transform
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(1.0, 0.92, 0.35, 0.45)
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(1.0, 0.95, 0.15, 1.0)
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.no_depth_test = true
 	_highlight.material_override = mat
 	_highlight.visible = false
 	add_child(_highlight)

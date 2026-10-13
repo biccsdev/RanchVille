@@ -110,13 +110,13 @@ Tests use a fake input helper that emits the same signals without a headset.
 
 ## Grab (BIC-19)
 
-**Grabbable** (`scripts/grab/grabbable.gd`) is a `Node3D` component (group `grabbable`). Export `grab_range_m` (default 0.15 m). `grab(holder)` reparents to the hand or controller holder and keeps world pose. `release()` restores the original parent and keeps world pose. No RigidBody physics in MVP.
+**Grabbable** (`scripts/grab/grabbable.gd`) is a `Node3D` component (group `grabbable`). Export `grab_range_m` (default 0.28 m). `grab(holder)` reparents to the hand or controller holder and keeps world pose. `release()` restores the original parent and keeps world pose. No RigidBody physics in MVP.
 
 **GrabSelector** (`scripts/grab/grab_selector.gd`) is headless-testable: `pick_nearest(origin, range_m, nodes)` and `pick_nearest_grabbable(origin, nodes)` (per-object range from each **Grabbable**).
 
-**GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold. Grab is disabled until **TableAnchor** is in `PLACED` mode (manual table confirm still uses trigger on **TableAnchor** directly).
+**GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold.
 
-Debug props: gray and orange `Grabbable` cubes under **FarmRoot** (`Marker` and `DebugGrabbable`). In-range targets show a yellow outline before pinch.
+Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. Two orange **Grabbable** cubes sit on FarmRoot. In-range targets show a solid yellow outline before pinch.
 
 **HandInteractionPoint** (`scripts/xr/hand_interaction_point.gd`) on each hand’s `InteractionPoint` child tracks the index tip for grab range. **HandInputXr** reads hand-joint pinch via **PinchDetector**, and falls back to controller `trigger` / `trigger_click`. `project.godot` references `openxr_action_map.tres` for Quest actions.
 

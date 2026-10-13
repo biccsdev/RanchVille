@@ -63,12 +63,8 @@ func test_xr_empty_has_farm_root_and_scene_manager() -> void:
 	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
 	assert_object(farm_root).is_not_null()
 	assert_bool(farm_root.has_node("Marker")).is_true()
-	var marker: Node = farm_root.get_node("Marker")
-	var marker_script: Script = marker.get_script()
-	assert_object(marker_script).is_not_null()
-	assert_str(marker_script.resource_path).is_equal("res://scripts/grab/grabbable.gd")
-	var marker_mesh: MeshInstance3D = marker.get_node("Mesh") as MeshInstance3D
-	var box: BoxMesh = marker_mesh.mesh as BoxMesh
+	var marker: MeshInstance3D = farm_root.get_node("Marker") as MeshInstance3D
+	var box: BoxMesh = marker.mesh as BoxMesh
 	assert_object(box).is_not_null()
 	assert_vector(box.size).is_equal(Vector3(0.075, 0.075, 0.075))
 	var origin: XROrigin3D = root.get_node("XROrigin3D") as XROrigin3D
@@ -96,6 +92,10 @@ func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	assert_bool(root.has_node("HandInputXr")).is_true()
 	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
 	assert_bool(farm_root.has_node("DebugGrabbable")).is_true()
+	assert_bool(farm_root.has_node("DebugGrabbable2")).is_true()
+	var xr_script: Script = root.get_node("HandInputXr").get_script()
+	assert_str(xr_script.source_code).contains("../XROrigin3D/RightHand")
+	assert_str(xr_script.source_code).contains("../XROrigin3D/LeftHand")
 
 
 func test_debug_grabbable_uses_grabbable_script() -> void:

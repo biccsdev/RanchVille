@@ -1,7 +1,6 @@
 class_name GrabSystem
 extends Node
 
-const _TableAnchorScript := preload("res://scripts/xr/table_anchor.gd")
 const _GrabSelector := preload("res://scripts/grab/grab_selector.gd")
 
 @export var left_hand_holder: Node3D
@@ -13,6 +12,12 @@ var _held: Dictionary = {}
 
 func _ready() -> void:
 	set_process(true)
+	if left_hand_holder == null:
+		left_hand_holder = get_node_or_null("../XROrigin3D/LeftHand/InteractionPoint") as Node3D
+	if right_hand_holder == null:
+		right_hand_holder = get_node_or_null("../XROrigin3D/RightHand/InteractionPoint") as Node3D
+	if table_anchor == null:
+		table_anchor = get_node_or_null("../TableAnchor")
 	var hand_input: Node = get_node_or_null("/root/HandInput")
 	if hand_input == null:
 		return
@@ -23,14 +28,7 @@ func _ready() -> void:
 
 
 func _grab_enabled() -> bool:
-	if table_anchor == null:
-		return true
-	if not is_instance_valid(table_anchor):
-		return true
-	return (
-		table_anchor.mode == _TableAnchorScript.Mode.PLACED
-		or table_anchor.mode == _TableAnchorScript.Mode.MANUAL
-	)
+	return true
 
 
 func _holder_for_hand(hand: StringName) -> Node3D:

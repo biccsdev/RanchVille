@@ -84,15 +84,12 @@ func test_left_pinch_end_does_not_release_right_hand_hold() -> void:
 	assert_bool(ctx["near"].is_held()).is_true()
 
 
-func test_grab_blocked_until_table_placed() -> void:
+func test_grab_works_while_table_seeking() -> void:
 	var ctx := _wire_scene()
 	var anchor: Node = _TableAnchorScript.new()
 	auto_free(anchor)
 	anchor.mode = _TableAnchorScript.Mode.SEEKING
 	ctx["grab_system"].table_anchor = anchor
-	ctx["fake"].pinch_start(&"right")
-	assert_bool(ctx["near"].is_held()).is_false()
-	anchor.mode = _TableAnchorScript.Mode.PLACED
 	ctx["fake"].pinch_start(&"right")
 	assert_bool(ctx["near"].is_held()).is_true()
 

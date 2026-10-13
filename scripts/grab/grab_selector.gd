@@ -1,8 +1,6 @@
 class_name GrabSelector
 extends RefCounted
 
-const _GrabbableScript := preload("res://scripts/grab/grabbable.gd")
-
 
 static func pick_nearest(
 	origin: Vector3,
@@ -35,9 +33,9 @@ static func pick_nearest_grabbable(origin: Vector3, nodes: Array) -> Node3D:
 		if not item is Node3D:
 			continue
 		var grabbable := item as Node3D
-		if grabbable.get_script() != _GrabbableScript:
+		if not grabbable.is_in_group(&"grabbable"):
 			continue
-		if grabbable.is_held():
+		if not grabbable.has_method("is_held") or grabbable.is_held():
 			continue
 		var range_m: float = grabbable.grab_range_m
 		var dist_sq := origin.distance_squared_to(_node_position(grabbable))
