@@ -1,19 +1,17 @@
-# BIC-14 — Shortlist low-poly asset packs and check licenses
+# BIC-15 — Input abstraction: HandInput with signals and fake input
 
 ## Checklist
 
 - [x] Create branch from `origin/main`
-- [x] Re-open store pages; record license, cost, commercial/Quest use
-- [x] Write `art/asset-shortlist.md` (table, no rows, recommended combo)
-- [x] Comment on [BIC-14](https://linear.app/biccs/issue/BIC-14) with path and recommendation
-- [x] Move BIC-14 to **In Review** (human approval; not Done)
-- [x] Lock MVP combo (Quaternius + Kenney Survival + Kenney Nature)
-- [x] Open PR for shortlist docs
+- [x] Add `scripts/input/hand_input.gd` (signals + emit methods)
+- [x] Add `scripts/input/fake_hand_input.gd`
+- [x] Register HandInput autoload in `project.godot`
+- [x] Add `tests/hand_input_test.gd`
+- [x] Run `./run_headless_tests.sh`
+- [ ] Open PR; note `project.godot` autoload edit
+- [ ] Move BIC-15 to **In Review**
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-14-shortlist-low-poly-asset-packs-and-check-licenses`
-- **PR:** https://github.com/biccsdev/RanchVille/pull/9
-- **Decision:** MVP uses the three free packs. Restaurant kitchen art is Later.
-- **Deliverable:** `art/asset-shortlist.md`
-- **Out of scope:** import assets, spend money, Godot scenes
+- **Branch:** `comprasvictortorres/bic-15-input-abstraction-handinput-with-signals-and-fake-input`
+- **PR:** (pending)
