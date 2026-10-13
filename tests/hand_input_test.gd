@@ -52,6 +52,15 @@ func test_fake_poke_fires_once() -> void:
 	assert_int(counts["poke"]).is_equal(1)
 
 
+func test_fake_pinch_sets_active_hand() -> void:
+	var hand := _make_hand_input()
+	var fake: RefCounted = _FakeHandInputScript.new(hand)
+	fake.pinch_start(&"left")
+	assert_str(String(hand.active_hand)).is_equal("left")
+	fake.pinch_end(&"right")
+	assert_str(String(hand.active_hand)).is_equal("right")
+
+
 func test_fake_poke_fires_once_per_event() -> void:
 	var hand := _make_hand_input()
 	var counts := _connect_counters(hand)

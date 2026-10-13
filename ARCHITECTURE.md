@@ -27,6 +27,8 @@ Planned subfolders (created when their issues land; not required for BIC-12):
 | Path | Role |
 |------|------|
 | `scripts/input/` | `HandInput`, fake input, pinch detector, controller mapping |
+| `scripts/grab/` | `Grabbable`, `GrabSelector`, `GrabSystem` |
+| `scripts/xr/` | Table anchor, XR bootstrap, `HandInputXr` |
 | `scripts/farm/` | Soil tile state machine, `CropGrowth`, `FakeClock` |
 | `scripts/economy/` | `CoinManager` |
 | `scripts/save/` | Versioned JSON save/load |
@@ -103,6 +105,20 @@ flowchart LR
 **PinchDetector** (`scripts/input/pinch_detector.gd`) is headless-testable pure geometry: thumb-tip and index-tip `Vector3` positions in, pinched or not out. Threshold: `PinchDetector.PINCH_DISTANCE_M` (meters); pinched when tip distance is less than or equal to that value (inclusive boundary). `apply()` emits `pinch_started` / `pinch_ended` on **HandInput** only when state changes. A future XR adapter under `scripts/input/` will read joints and call `apply()`; it may use OpenXR. Controller trigger or grip maps to pinch start/end; a documented button or poke pose maps to `poke`. All gameplay code subscribes to **HandInput** only.
 
 Tests use a fake input helper that emits the same signals without a headset.
+
+**HandInput** also exposes `active_hand` (`&"left"` or `&"right"`). XR and fake sources set it before each pinch emit so grab logic knows which holder to use.
+
+**HandInputXr** (`scripts/xr/hand_input_xr.gd`) maps `XRController3D` `trigger_click` press and release on the scene left/right hand trackers to **HandInput** pinch start/end. OpenXR types stay under `scripts/xr/` only.
+
+## Grab (BIC-19)
+
+**Grabbable** (`scripts/grab/grabbable.gd`) is a `Node3D` component (group `grabbable`). Export `grab_range_m` (default 0.15 m). `grab(holder)` reparents to the hand or controller holder and keeps world pose. `release()` restores the original parent and keeps world pose. No RigidBody physics in MVP.
+
+**GrabSelector** (`scripts/grab/grab_selector.gd`) is headless-testable: `pick_nearest(origin, range_m, nodes)` and `pick_nearest_grabbable(origin, nodes)` (per-object range from each **Grabbable**).
+
+**GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold. Grab is disabled until **TableAnchor** is in `PLACED` mode (manual table confirm still uses trigger on **TableAnchor** directly).
+
+Debug prop: `scenes/debug_grabbable.tscn` instanced under **FarmRoot** in `scenes/xr_empty.tscn`.
 
 ## Table anchor and FarmRoot (BIC-18)
 

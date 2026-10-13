@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://0be8hm45m8u3" path="res://scripts/xr_bootstrap.gd" id="1_bootstrap"]
 [ext_resource type="Script" uid="uid://p7qbwvgu631h" path="res://scripts/xr/table_anchor.gd" id="2_table_anchor"]
 [ext_resource type="PackedScene" path="res://scenes/table_surface.tscn" id="3_table_surface"]
+[ext_resource type="Script" path="res://scripts/xr/hand_input_xr.gd" id="4_hand_input_xr"]
+[ext_resource type="Script" path="res://scripts/grab/grab_system.gd" id="5_grab_system"]
+[ext_resource type="PackedScene" path="res://scenes/debug_grabbable.tscn" id="6_debug_grabbable"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_marker"]
 size = Vector3(0.075, 0.075, 0.075)
@@ -39,8 +42,22 @@ scenes/table = ExtResource("3_table_surface")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0375, 0)
 mesh = SubResource("BoxMesh_marker")
 
+[node name="DebugGrabbable" parent="FarmRoot" instance=ExtResource("6_debug_grabbable")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.0375, 0)
+
 [node name="TableAnchor" type="Node" parent="." unique_id=201104749]
 script = ExtResource("2_table_anchor")
+
+[node name="HandInputXr" type="Node" parent="."]
+script = ExtResource("4_hand_input_xr")
+left_hand = NodePath("../XROrigin3D/LeftHand")
+right_hand = NodePath("../XROrigin3D/RightHand")
+
+[node name="GrabSystem" type="Node" parent="."]
+script = ExtResource("5_grab_system")
+left_hand_holder = NodePath("../XROrigin3D/LeftHand")
+right_hand_holder = NodePath("../XROrigin3D/RightHand")
+table_anchor = NodePath("../TableAnchor")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=454710415]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 4, 0)

@@ -77,3 +77,28 @@ func test_project_enables_meta_scene_api() -> void:
 	var text := FileAccess.get_file_as_string(_PROJECT_SETTINGS)
 	assert_str(text).contains("openxr/extensions/meta/scene_api=true")
 	assert_str(text).contains("openxr/extensions/meta/anchor_api=true")
+
+
+func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
+	var packed: PackedScene = load(_MAIN_SCENE) as PackedScene
+	var root: Node = auto_free(packed.instantiate())
+	assert_bool(root.has_node("GrabSystem")).is_true()
+	assert_bool(root.has_node("HandInputXr")).is_true()
+	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
+	assert_bool(farm_root.has_node("DebugGrabbable")).is_true()
+
+
+func test_debug_grabbable_uses_grabbable_script() -> void:
+	var packed: PackedScene = load("res://scenes/debug_grabbable.tscn") as PackedScene
+	var prop: Node = auto_free(packed.instantiate())
+	var script: Script = prop.get_script()
+	assert_object(script).is_not_null()
+	assert_str(script.resource_path).is_equal("res://scripts/grab/grabbable.gd")
+
+
+func test_hand_input_xr_maps_trigger_click() -> void:
+	var text := FileAccess.get_file_as_string("res://scripts/xr/hand_input_xr.gd")
+	assert_str(text).contains("trigger_click")
+	assert_str(text).contains("emit_pinch_started")
+	assert_str(text).contains("emit_pinch_ended")
+	assert_str(text).contains("active_hand")

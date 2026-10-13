@@ -4,6 +4,8 @@ signal pinch_started
 signal pinch_ended
 signal poke
 
+var active_hand: StringName = &"right"
+
 
 func emit_pinch_started() -> void:
 	pinch_started.emit()
