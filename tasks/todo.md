@@ -1,16 +1,19 @@
-# BIC-21 — Soil tile state machine, unit-tested
+# BIC-24 — Crop growth stages, data-driven and unit-tested
 
 ## Checklist
 
-- [x] Create branch from `origin/main`
-- [x] Add `scripts/farm/soil_tile.gd` (enum, till/plant, state_changed)
-- [x] Add `tests/soil_tile_test.gd`
-- [x] Run `./run_headless_tests.sh`
-- [ ] Open PR (no `.tscn` change)
-- [ ] Move BIC-21 to **In Review**
+- [ ] Create branch from `origin/main`
+- [ ] Add `CropStage`, `CropData`, `wheat_crop.tres`
+- [ ] Add `FakeClock`, `CropGrowth`
+- [ ] Add `tests/crop_growth_test.gd`
+- [ ] Run `./run_headless_tests.sh`
+- [ ] Update `ARCHITECTURE.md`
+- [ ] Open PR
+- [ ] Move BIC-24 to **In Review**
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-21-soil-tile-state-machine-unit-tested`
+- **Branch:** (pending)
 - **PR:** (pending)
-- **Headless:** 28/28 passed (local Godot 4.7.2; gdUnit exit 0; OpenXR vendor SIGSEGV on shutdown locally)
+- **Headless:** (pending)
+- **Linear:** In Progress

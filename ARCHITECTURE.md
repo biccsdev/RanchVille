@@ -27,7 +27,7 @@ Planned subfolders (created when their issues land; not required for BIC-12):
 | Path | Role |
 |------|------|
 | `scripts/input/` | `HandInput`, fake input, pinch detector, controller mapping |
-| `scripts/farm/` | Soil tile state machine, growth helpers |
+| `scripts/farm/` | Soil tile state machine, `CropGrowth`, `FakeClock` |
 | `scripts/economy/` | `CoinManager` |
 | `scripts/save/` | Versioned JSON save/load |
 | `scripts/audio/` | `AudioManager` |
@@ -53,13 +53,20 @@ These are not autoloads: soil tile instances, `Grabbable`, shop UI, unlock rules
 
 Class: `CropData`. Files: `resources/crops/*.tres` (e.g. `wheat_crop.tres`).
 
-Fields (implemented in later issues):
+Implemented (BIC-24):
 
-- Growth time
-- Seed cost
-- Sell price
-- Model references
+- `crop_id` and an ordered `stages` array of `CropStage` resources
+- Each `CropStage` has `id`, `duration_sec`, placeholder `mesh`, and `harvest_ready` (exactly one stage, on the last)
 - At least three visible growth stages, including harvest-ready
+
+Still planned in later issues:
+
+- Aggregate growth time, seed cost, and sell price ([BIC-29](https://linear.app/biccs/issue/BIC-29/cropdata-resource-growth-time-prices-models))
+- Final art model paths when import lands
+
+**CropGrowth** (`scripts/farm/crop_growth.gd`) is a headless-testable helper: it advances elapsed time only after `water()`, maps time to stage index, and exposes `is_harvest_ready()`. It is not an autoload. **GrowthSystem** timers and session wiring remain [BIC-27](https://linear.app/biccs/issue/BIC-27/growthsystem-with-timers-unit-tested).
+
+**FakeClock** (`scripts/farm/fake_clock.gd`) advances test time; **GrowthSystem** tests will reuse it.
 
 Prices and growth data live on the resource, not in `.tscn` files.
 
