@@ -12,7 +12,7 @@ ambient_light_color = Color(0.4, 0.45, 0.5, 1)
 ambient_light_energy = 0.8
 
 [sub_resource type="BoxMesh" id="BoxMesh_marker"]
-size = Vector3(0.3, 0.3, 0.3)
+size = Vector3(0.075, 0.075, 0.075)
 
 [node name="XrEmpty" type="Node3D"]
 script = ExtResource("1_bootstrap")
@@ -37,7 +37,7 @@ scenes/table = ExtResource("3_table_surface")
 visible = false
 
 [node name="Marker" type="MeshInstance3D" parent="FarmRoot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0375, 0)
 mesh = SubResource("BoxMesh_marker")
 
 [node name="TableAnchor" type="Node" parent="."]

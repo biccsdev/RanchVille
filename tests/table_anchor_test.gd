@@ -3,6 +3,7 @@ extends GdUnitTestSuite
 
 const _TableAnchorPickerScript := preload("res://scripts/xr/table_anchor_picker.gd")
 const _TableAnchorScript := preload("res://scripts/xr/table_anchor.gd")
+const _TableSurfaceScript := preload("res://scripts/xr/table_surface.gd")
 const _TABLE_ANCHOR_SCRIPT := "res://scripts/xr/table_anchor.gd"
 const _TABLE_ANCHOR_PICKER_SCRIPT := "res://scripts/xr/table_anchor_picker.gd"
 
@@ -45,7 +46,7 @@ func test_attach_farm_to_anchor_parents_and_resets_local_transform() -> void:
 
 	assert_object(farm.get_parent()).is_same(anchor)
 	assert_vector(farm.position).is_equal(Vector3.ZERO)
-	assert_vector(marker.position).is_equal(Vector3(0.0, 0.15, 0.0))
+	assert_vector(marker.position).is_equal(Vector3(0.0, 0.0375, 0.0))
 
 
 func test_lock_farm_at_transform_keeps_world_pose_on_root() -> void:
@@ -62,7 +63,7 @@ func test_lock_farm_at_transform_keeps_world_pose_on_root() -> void:
 
 	assert_object(farm.get_parent()).is_same(world)
 	assert_vector(farm.position).is_equal(Vector3(1.0, 0.5, 2.0))
-	assert_vector(marker.position).is_equal(Vector3(0.0, 0.15, 0.0))
+	assert_vector(marker.position).is_equal(Vector3(0.0, 0.0375, 0.0))
 
 
 func test_table_anchor_logic_capture_fail_enters_manual() -> void:
@@ -127,6 +128,31 @@ func test_table_anchor_waits_for_session_before_no_table_fallback() -> void:
 	assert_str(text).contains("session_begun")
 	assert_str(text).contains("NO_TABLE_SEC")
 	assert_str(text).contains("USE_SCENE")
+
+
+func test_aabb_top_is_table_surface_height() -> void:
+	var box := AABB(Vector3(-0.4, -0.35, -0.3), Vector3(0.8, 0.7, 0.6))
+	assert_vector(Vector3(_TableSurfaceScript.height_from_aabb(box), 0.0, 0.0)).is_equal(
+		Vector3(0.35, 0.0, 0.0)
+	)
+
+
+func test_attach_farm_raises_to_table_surface() -> void:
+	var anchor := Node3D.new()
+	auto_free(anchor)
+	var world := Node3D.new()
+	auto_free(world)
+	world.add_child(anchor)
+	var farm := Node3D.new()
+	var marker := MeshInstance3D.new()
+	marker.name = "Marker"
+	farm.add_child(marker)
+	world.add_child(farm)
+
+	_TableAnchorScript.attach_farm_to_anchor(farm, anchor, 0.0375, 0.35)
+
+	assert_vector(farm.position).is_equal(Vector3(0.0, 0.35, 0.0))
+	assert_vector(marker.position).is_equal(Vector3(0.0, 0.0375, 0.0))
 
 
 func test_no_table_timeout_in_seeking_enters_manual() -> void:

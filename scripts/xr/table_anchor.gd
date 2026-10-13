@@ -7,7 +7,8 @@ enum Mode { SEEKING, MANUAL, PLACED }
 
 const SETTLE_SEC := 1.0
 const NO_TABLE_SEC := 3.0
-const MARKER_SURFACE_OFFSET_Y := 0.15
+const CUBE_SIZE_M := 0.075
+const MARKER_SURFACE_OFFSET_Y := CUBE_SIZE_M * 0.5
 const SCENE_PERMISSION := "com.oculus.permission.USE_SCENE"
 const MANUAL_PREVIEW_FORWARD_M := 0.7
 const MANUAL_PREVIEW_DROP_M := 0.55
@@ -187,7 +188,12 @@ func enter_manual_mode() -> void:
 
 
 func place_on_table(anchor: XRAnchor3D) -> void:
-	attach_farm_to_anchor(_farm_root, anchor, MARKER_SURFACE_OFFSET_Y)
+	attach_farm_to_anchor(
+		_farm_root,
+		anchor,
+		MARKER_SURFACE_OFFSET_Y,
+		surface_height_from_anchor(anchor)
+	)
 	if _farm_root != null:
 		_farm_root.visible = true
 	mode = Mode.PLACED
@@ -227,14 +233,22 @@ func _camera_preview_transform() -> Transform3D:
 	return Transform3D(Basis.IDENTITY, origin)
 
 
+static func surface_height_from_anchor(anchor: Node3D) -> float:
+	for child: Node in anchor.get_children():
+		if child.has_method("get_surface_height"):
+			return child.get_surface_height()
+	return 0.0
+
+
 static func attach_farm_to_anchor(
 	farm_root: Node3D,
 	anchor: Node3D,
-	marker_offset_y: float = MARKER_SURFACE_OFFSET_Y
+	marker_offset_y: float = MARKER_SURFACE_OFFSET_Y,
+	surface_height_m: float = 0.0
 ) -> void:
 	if farm_root.get_parent() != anchor:
 		farm_root.reparent(anchor)
-	farm_root.transform = Transform3D.IDENTITY
+	farm_root.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, surface_height_m, 0.0))
 	var marker: Node3D = farm_root.get_node_or_null("Marker") as Node3D
 	if marker != null:
 		marker.position = Vector3(0.0, marker_offset_y, 0.0)

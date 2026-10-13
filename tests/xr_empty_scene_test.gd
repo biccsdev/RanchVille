@@ -63,6 +63,10 @@ func test_xr_empty_has_farm_root_and_scene_manager() -> void:
 	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
 	assert_object(farm_root).is_not_null()
 	assert_bool(farm_root.has_node("Marker")).is_true()
+	var marker: MeshInstance3D = farm_root.get_node("Marker") as MeshInstance3D
+	var box: BoxMesh = marker.mesh as BoxMesh
+	assert_object(box).is_not_null()
+	assert_vector(box.size).is_equal(Vector3(0.075, 0.075, 0.075))
 	var origin: XROrigin3D = root.get_node("XROrigin3D") as XROrigin3D
 	assert_bool(origin.has_node("OpenXRFbSceneManager")).is_true()
 	assert_bool(origin.has_node("RightHand")).is_true()
