@@ -23,6 +23,14 @@ var _settle_generation := 0
 
 
 func _ready() -> void:
+	var hand_input: Node = get_node_or_null("/root/HandInput")
+	if hand_input != null:
+		hand_input.poke.connect(_on_hand_poke)
+
+	for hand: XRController3D in [_right_hand, _left_hand]:
+		if hand != null:
+			hand.button_pressed.connect(_on_controller_button_pressed.bind(hand))
+
 	if not _openxr_active():
 		mode = Mode.MANUAL
 		return
@@ -30,13 +38,6 @@ func _ready() -> void:
 	_scene_manager.openxr_fb_scene_anchor_created.connect(_on_scene_anchor_created)
 	_scene_manager.openxr_fb_scene_data_missing.connect(_on_scene_data_missing)
 	_scene_manager.openxr_fb_scene_capture_completed.connect(_on_scene_capture_completed)
-
-	if HandInput.has_signal("poke"):
-		HandInput.poke.connect(_on_hand_poke)
-
-	for hand: XRController3D in [_right_hand, _left_hand]:
-		if hand != null:
-			hand.button_pressed.connect(_on_controller_button_pressed.bind(hand))
 
 	_restart_settle_timer()
 
@@ -64,7 +65,7 @@ func _active_controller() -> XRController3D:
 
 
 func _on_scene_anchor_created(_scene_node: Object, spatial_entity: OpenXRFbSpatialEntity) -> void:
-	if mode != Mode.SEEKING:
+	if mode == Mode.PLACED:
 		return
 	if not _Picker.is_table_label(spatial_entity.get_semantic_labels()):
 		return
@@ -88,10 +89,11 @@ func _restart_settle_timer() -> void:
 func _on_settle_timeout(generation: int) -> void:
 	if generation != _settle_generation:
 		return
-	if mode != Mode.SEEKING:
+	if mode == Mode.PLACED:
 		return
 	if _table_candidates.is_empty():
-		enter_manual_mode()
+		if mode == Mode.SEEKING:
+			enter_manual_mode()
 		return
 	var nodes: Array[Node3D] = []
 	for anchor: XRAnchor3D in _table_candidates:

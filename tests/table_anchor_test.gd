@@ -74,6 +74,40 @@ func test_table_anchor_logic_capture_fail_enters_manual() -> void:
 	assert_int(anchor.mode).is_equal(_TableAnchorScript.Mode.MANUAL)
 
 
+func test_settle_timeout_in_seeking_with_no_candidates_enters_manual() -> void:
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor.mode = _TableAnchorScript.Mode.SEEKING
+	anchor._settle_generation = 2
+	anchor._on_settle_timeout(2)
+	assert_int(anchor.mode).is_equal(_TableAnchorScript.Mode.MANUAL)
+
+
+func test_settle_timeout_when_placed_is_noop() -> void:
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor.mode = _TableAnchorScript.Mode.PLACED
+	anchor._on_settle_timeout(1)
+	assert_int(anchor.mode).is_equal(_TableAnchorScript.Mode.PLACED)
+
+
+func test_settle_timeout_in_manual_with_no_candidates_stays_manual() -> void:
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor.mode = _TableAnchorScript.Mode.MANUAL
+	anchor._on_settle_timeout(1)
+	assert_int(anchor.mode).is_equal(_TableAnchorScript.Mode.MANUAL)
+
+
+func test_scene_data_missing_after_capture_requested_enters_manual() -> void:
+	var anchor: Node = _TableAnchorScript.new()
+	auto_free(anchor)
+	anchor.mode = _TableAnchorScript.Mode.SEEKING
+	anchor._capture_requested = true
+	anchor._on_scene_data_missing()
+	assert_int(anchor.mode).is_equal(_TableAnchorScript.Mode.MANUAL)
+
+
 func test_xr_scripts_do_not_reference_openxr_in_farm_or_input() -> void:
 	for path in [
 		"res://scripts/farm/crop_growth.gd",
