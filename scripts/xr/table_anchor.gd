@@ -12,6 +12,8 @@ const MARKER_SURFACE_OFFSET_Y := CUBE_SIZE_M * 0.5
 const SCENE_PERMISSION := "com.oculus.permission.USE_SCENE"
 const MANUAL_PREVIEW_FORWARD_M := 0.7
 const MANUAL_PREVIEW_DROP_M := 0.55
+const TABLE_OFFSET_RIGHT := 0.25
+const TABLE_OFFSET_TOWARD := 0.20
 
 var mode: Mode = Mode.SEEKING
 var _capture_requested := false
@@ -188,12 +190,20 @@ func enter_manual_mode() -> void:
 
 
 func place_on_table(anchor: XRAnchor3D) -> void:
-	attach_farm_to_anchor(
-		_farm_root,
-		anchor,
-		MARKER_SURFACE_OFFSET_Y,
-		surface_height_from_anchor(anchor)
+	var toward := Vector3.ZERO
+	if _camera != null:
+		toward = _camera.global_position - anchor.global_position
+	var aligned := table_place_offset(
+		surface_height_from_anchor(anchor),
+		surface_size_from_anchor(anchor),
+		toward
 	)
+	var world_xz := Vector3(aligned.x, 0.0, aligned.z)
+	var local_xz := world_xz
+	if anchor.is_inside_tree():
+		local_xz = anchor.global_transform.basis.inverse() * world_xz
+	var local_origin := Vector3(local_xz.x, aligned.y, local_xz.z)
+	attach_farm_to_anchor(_farm_root, anchor, MARKER_SURFACE_OFFSET_Y, local_origin)
 	if _farm_root != null:
 		_farm_root.visible = true
 	mode = Mode.PLACED
@@ -240,15 +250,39 @@ static func surface_height_from_anchor(anchor: Node3D) -> float:
 	return 0.0
 
 
+static func surface_size_from_anchor(anchor: Node3D) -> Vector3:
+	for child: Node in anchor.get_children():
+		if child.has_method("get_surface_size"):
+			return child.get_surface_size()
+	return Vector3(0.8, 0.0, 0.6)
+
+
+static func table_place_offset(
+	surface_height_m: float,
+	table_size: Vector3,
+	toward_flat: Vector3
+) -> Vector3:
+	var toward := toward_flat
+	toward.y = 0.0
+	if toward.length_squared() < 0.0001:
+		toward = Vector3(0.0, 0.0, 1.0)
+	else:
+		toward = toward.normalized()
+	var right := Vector3(toward.z, 0.0, -toward.x)
+	var world := right * (table_size.x * TABLE_OFFSET_RIGHT)
+	world += toward * (table_size.z * TABLE_OFFSET_TOWARD)
+	return Vector3(world.x, surface_height_m, world.z)
+
+
 static func attach_farm_to_anchor(
 	farm_root: Node3D,
 	anchor: Node3D,
 	marker_offset_y: float = MARKER_SURFACE_OFFSET_Y,
-	surface_height_m: float = 0.0
+	local_origin: Vector3 = Vector3.ZERO
 ) -> void:
 	if farm_root.get_parent() != anchor:
 		farm_root.reparent(anchor)
-	farm_root.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, surface_height_m, 0.0))
+	farm_root.transform = Transform3D(Basis.IDENTITY, local_origin)
 	var marker: Node3D = farm_root.get_node_or_null("Marker") as Node3D
 	if marker != null:
 		marker.position = Vector3(0.0, marker_offset_y, 0.0)

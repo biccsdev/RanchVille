@@ -130,6 +130,15 @@ func test_table_anchor_waits_for_session_before_no_table_fallback() -> void:
 	assert_str(text).contains("USE_SCENE")
 
 
+func test_table_place_offset_moves_right_and_toward_user() -> void:
+	var offset: Vector3 = _TableAnchorScript.table_place_offset(
+		0.35,
+		Vector3(1.0, 0.0, 1.0),
+		Vector3(0.0, 0.0, 1.0)
+	)
+	assert_vector(offset).is_equal(Vector3(0.25, 0.35, 0.20))
+
+
 func test_aabb_top_is_table_surface_height() -> void:
 	var box := AABB(Vector3(-0.4, -0.35, -0.3), Vector3(0.8, 0.7, 0.6))
 	assert_vector(Vector3(_TableSurfaceScript.height_from_aabb(box), 0.0, 0.0)).is_equal(
@@ -149,7 +158,7 @@ func test_attach_farm_raises_to_table_surface() -> void:
 	farm.add_child(marker)
 	world.add_child(farm)
 
-	_TableAnchorScript.attach_farm_to_anchor(farm, anchor, 0.0375, 0.35)
+	_TableAnchorScript.attach_farm_to_anchor(farm, anchor, 0.0375, Vector3(0.0, 0.35, 0.0))
 
 	assert_vector(farm.position).is_equal(Vector3(0.0, 0.35, 0.0))
 	assert_vector(marker.position).is_equal(Vector3(0.0, 0.0375, 0.0))
