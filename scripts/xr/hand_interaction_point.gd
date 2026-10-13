@@ -35,12 +35,14 @@ func _apply_index_tip_position() -> bool:
 	var hand: XRHandTracker = _Lookup.get_hand(side)
 	if hand == null or not hand.has_tracking_data:
 		return false
-	var joint: Transform3D = hand.get_hand_joint_transform(XRHandTracker.HAND_JOINT_INDEX_FINGER_TIP)
+	var tip: Transform3D = hand.get_hand_joint_transform(XRHandTracker.HAND_JOINT_INDEX_FINGER_TIP)
+	var palm: Transform3D = hand.get_hand_joint_transform(XRHandTracker.HAND_JOINT_PALM)
 	var origin := _xr_origin()
+	var origin_xf := Transform3D.IDENTITY
 	if origin != null:
-		global_position = origin.to_global(joint.origin)
-	else:
-		global_position = joint.origin
+		origin_xf = origin.global_transform
+	# Position at the index tip. Rotation from the palm, like a controller grip.
+	global_transform = Transform3D((origin_xf * palm).basis, origin_xf * tip.origin)
 	return true
 
 
