@@ -2,6 +2,7 @@ class_name HandInputXr
 extends Node
 
 const _PinchDetector := preload("res://scripts/input/pinch_detector.gd")
+const _Lookup := preload("res://scripts/xr/hand_tracker_lookup.gd")
 
 @onready var left_hand: XRController3D = $"../XROrigin3D/LeftHand"
 @onready var right_hand: XRController3D = $"../XROrigin3D/RightHand"
@@ -20,68 +21,51 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	_update_hand_pinch(&"left", left_hand, _pinch_left)
-	_update_hand_pinch(&"right", right_hand, _pinch_right)
+	_update_pinch(&"left", left_hand, _pinch_left)
+	_update_pinch(&"right", right_hand, _pinch_right)
 
 
-func _update_hand_pinch(side: StringName, hand: XRController3D, detector: PinchDetector) -> void:
-	if hand == null:
-		return
-	if _apply_hand_pinch(side, hand, detector):
-		return
-	_poll_controller_pinch(hand, side)
+func _update_pinch(side: StringName, hand: XRController3D, detector: PinchDetector) -> void:
+	var pinched := _joint_pinched(side, detector) or _controller_pinching(hand)
+	_emit_pinch_edge(side, pinched)
 
 
-func _apply_hand_pinch(side: StringName, hand: XRController3D, detector: PinchDetector) -> bool:
-	var tracker: XRTracker = XRServer.get_tracker(hand.tracker)
-	if tracker == null or not tracker is XRHandTracker:
-		return false
-	var ht: XRHandTracker = tracker as XRHandTracker
-	if not ht.has_tracking_data:
+func _joint_pinched(side: StringName, detector: PinchDetector) -> bool:
+	var ht: XRHandTracker = _Lookup.get_hand(side)
+	if ht == null or not ht.has_tracking_data:
 		return false
 	var thumb: Vector3 = ht.get_hand_joint_transform(XRHandTracker.HAND_JOINT_THUMB_TIP).origin
 	var index: Vector3 = ht.get_hand_joint_transform(XRHandTracker.HAND_JOINT_INDEX_FINGER_TIP).origin
-	var bus: Node = _hand_input()
-	if bus == null:
-		return false
-	bus.active_hand = side
-	detector.apply(thumb, index, bus)
-	return true
-
-
-func _hand_uses_joint_pinch(hand: XRController3D) -> bool:
-	var tracker: XRTracker = XRServer.get_tracker(hand.tracker)
-	if tracker == null or not tracker is XRHandTracker:
-		return false
-	return (tracker as XRHandTracker).has_tracking_data
+	return detector.is_pinched(thumb, index)
 
 
 func _controller_pinching(hand: XRController3D) -> bool:
+	if hand == null:
+		return false
+	if not hand.get_is_active() and not hand.get_has_tracking_data():
+		return false
 	if hand.is_button_pressed(&"trigger_click"):
 		return true
 	if hand.is_button_pressed(&"grip_click"):
 		return true
-	if hand.get_float(&"trigger") > 0.6:
+	if hand.get_float(&"trigger") > 0.4:
 		return true
-	if hand.get_float(&"grip") > 0.6:
+	if hand.get_float(&"grip") > 0.4:
 		return true
 	return false
 
 
-func _poll_controller_pinch(hand: XRController3D, side: StringName) -> void:
-	if not hand.get_is_active() and not hand.get_has_tracking_data():
+func _emit_pinch_edge(side: StringName, pinched: bool) -> void:
+	if pinched == _trigger_down[side]:
 		return
-	var pressed: bool = _controller_pinching(hand)
+	_trigger_down[side] = pinched
 	var bus: Node = _hand_input()
 	if bus == null:
 		return
-	if pressed and not _trigger_down[side]:
-		_trigger_down[side] = true
-		bus.active_hand = side
+	bus.active_hand = side
+	if pinched:
 		bus.emit_pinch_started()
-	elif not pressed and _trigger_down[side]:
-		_trigger_down[side] = false
-		bus.active_hand = side
+	else:
 		bus.emit_pinch_ended()
 
 
@@ -98,32 +82,15 @@ func _hand_input() -> Node:
 func _on_button_pressed(button_name: StringName, hand: XRController3D) -> void:
 	if button_name != &"trigger_click" and button_name != &"grip_click":
 		return
-	if _hand_uses_joint_pinch(hand):
-		return
-	var id := _hand_id(hand)
-	if _trigger_down[id]:
-		return
-	_trigger_down[id] = true
-	var bus := _hand_input()
-	if bus == null:
-		return
-	bus.active_hand = id
-	bus.emit_pinch_started()
+	_emit_pinch_edge(_hand_id(hand), true)
 
 
 func _on_button_released(button_name: StringName, hand: XRController3D) -> void:
 	if button_name != &"trigger_click" and button_name != &"grip_click":
 		return
-	if _hand_uses_joint_pinch(hand):
-		return
 	if _controller_pinching(hand):
 		return
-	var id := _hand_id(hand)
-	if not _trigger_down[id]:
+	var side := _hand_id(hand)
+	if _joint_pinched(side, _pinch_left if side == &"left" else _pinch_right):
 		return
-	_trigger_down[id] = false
-	var bus := _hand_input()
-	if bus == null:
-		return
-	bus.active_hand = id
-	bus.emit_pinch_ended()
+	_emit_pinch_edge(side, false)

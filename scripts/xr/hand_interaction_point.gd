@@ -1,24 +1,39 @@
 class_name HandInteractionPoint
 extends Node3D
 
-## World position used for grab range and highlight (index tip when hand tracking is active).
-@export var hand_tracker_name: StringName = &"right_hand"
+const _Lookup := preload("res://scripts/xr/hand_tracker_lookup.gd")
+
+@export var side: StringName = &"right"
 @export var local_fallback: Vector3 = Vector3(0.0, 0.0, -0.08)
+
+var _marker: MeshInstance3D
+var _marker_mat: StandardMaterial3D
+
+
+func _ready() -> void:
+	_marker_mat = StandardMaterial3D.new()
+	_marker_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_marker_mat.no_depth_test = true
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.012
+	mesh.height = 0.024
+	_marker = MeshInstance3D.new()
+	_marker.name = &"HandDetectMarker"
+	_marker.mesh = mesh
+	_marker.material_override = _marker_mat
+	add_child(_marker)
 
 
 func _process(_delta: float) -> void:
-	if _apply_index_tip_position():
-		return
-	if get_parent() is Node3D:
+	var tracked := _apply_index_tip_position()
+	if not tracked and get_parent() is Node3D:
 		global_position = (get_parent() as Node3D).to_global(local_fallback)
+	_update_marker_color(tracked)
 
 
 func _apply_index_tip_position() -> bool:
-	var tracker: XRTracker = XRServer.get_tracker(hand_tracker_name)
-	if tracker == null or not tracker is XRHandTracker:
-		return false
-	var hand: XRHandTracker = tracker as XRHandTracker
-	if not hand.has_tracking_data:
+	var hand: XRHandTracker = _Lookup.get_hand(side)
+	if hand == null or not hand.has_tracking_data:
 		return false
 	var joint: Transform3D = hand.get_hand_joint_transform(XRHandTracker.HAND_JOINT_INDEX_FINGER_TIP)
 	var origin := _xr_origin()
@@ -27,6 +42,20 @@ func _apply_index_tip_position() -> bool:
 	else:
 		global_position = joint.origin
 	return true
+
+
+func _update_marker_color(hand_tracked: bool) -> void:
+	if _marker_mat == null:
+		return
+	if hand_tracked:
+		_marker_mat.albedo_color = Color(0.15, 0.95, 1.0, 1.0)
+	elif get_parent() is XRController3D and (
+		(get_parent() as XRController3D).get_is_active()
+		or (get_parent() as XRController3D).get_has_tracking_data()
+	):
+		_marker_mat.albedo_color = Color(0.35, 0.35, 0.4, 1.0)
+	else:
+		_marker_mat.albedo_color = Color(0.15, 0.15, 0.15, 1.0)
 
 
 func _xr_origin() -> XROrigin3D:

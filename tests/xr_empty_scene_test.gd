@@ -93,9 +93,14 @@ func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
 	assert_bool(farm_root.has_node("DebugGrabbable")).is_true()
 	assert_bool(farm_root.has_node("DebugGrabbable2")).is_true()
+	var green: Node = farm_root.get_node("DebugGrabbable2")
+	assert_str(green.scene_file_path).is_equal("res://scenes/debug_grabbable_green.tscn")
 	var xr_script: Script = root.get_node("HandInputXr").get_script()
 	assert_str(xr_script.source_code).contains("../XROrigin3D/RightHand")
-	assert_str(xr_script.source_code).contains("../XROrigin3D/LeftHand")
+	var lookup := FileAccess.get_file_as_string("res://scripts/xr/hand_tracker_lookup.gd")
+	assert_str(lookup).contains("/user/hand_tracker/left")
+	var point_script: Script = root.get_node("XROrigin3D/RightHand/InteractionPoint").get_script()
+	assert_str(point_script.source_code).contains("HandDetectMarker")
 
 
 func test_debug_grabbable_uses_grabbable_script() -> void:

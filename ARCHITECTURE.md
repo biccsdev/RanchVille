@@ -118,7 +118,7 @@ Tests use a fake input helper that emits the same signals without a headset.
 
 Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. Two orange **Grabbable** cubes sit on FarmRoot. In-range targets show a solid yellow outline before pinch.
 
-**HandInteractionPoint** (`scripts/xr/hand_interaction_point.gd`) on each hand’s `InteractionPoint` child tracks the index tip for grab range. **HandInputXr** reads hand-joint pinch via **PinchDetector**, and falls back to controller `trigger` / `trigger_click`. `project.godot` references `openxr_action_map.tres` for Quest actions.
+**HandInteractionPoint** (`scripts/xr/hand_interaction_point.gd`) on each hand’s `InteractionPoint` child tracks the index tip for grab range. A small sphere on that point is cyan when `/user/hand_tracker/*` has data, dim when only the controller pose is live. **HandInputXr** pinches from those joints **or** controller trigger/grip. `HandTrackerLookup` (`scripts/xr/hand_tracker_lookup.gd`) resolves OpenXR tracker names. `project.godot` references `openxr_action_map.tres` for Quest actions. Debug props: orange and green cubes on FarmRoot.
 
 ## Table anchor and FarmRoot (BIC-18)
 

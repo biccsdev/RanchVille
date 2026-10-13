@@ -66,6 +66,14 @@ If `left_hand` / `right_hand` stay null, pinch never fires.
 Use `@onready` paths like `$"../XROrigin3D/RightHand"`.
 Select grab targets by group `grabbable`, not `get_script()` identity.
 
+## XRHandTracker names are /user/hand_tracker/left
+
+`XRController3D.tracker` is `left_hand` / `right_hand`.
+`XRServer.get_tracker("right_hand")` is not an `XRHandTracker`.
+OpenXR registers `/user/hand_tracker/left` and `/user/hand_tracker/right`.
+Look those names up for joint pinch and the index-tip grab point.
+A small sphere on `HandInteractionPoint` shows tracking: cyan = hands, dim = controller.
+
 ## Godot 4.7 index tip joint is HAND_JOINT_INDEX_FINGER_TIP
 
 `HAND_JOINT_INDEX_TIP` does not exist. Numeric `8` is an intermediate phalanx.
