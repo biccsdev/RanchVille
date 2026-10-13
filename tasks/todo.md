@@ -9,10 +9,11 @@
 - [x] Update `ARCHITECTURE.md`
 - [x] Open PR
 - [x] Move BIC-16 to **In Review**
+- [x] PR merged; BIC-16 **Done**
 
 ## Review
 
-- **Branch:** `comprasvictortorres/bic-16-hand-tracking-pinch-detection-with-unit-tested-thresholds`
+- **Branch:** `comprasvictortorres/bic-16-hand-tracking-pinch-detection-with-unit-tested-thresholds` (merged)
 - **PR:** https://github.com/biccsdev/RanchVille/pull/13
 - **Headless:** 45/45 passed (Godot 4.7.2; gdUnit exit 0; OpenXR addon crash on editor shutdown only)
-- **Linear:** In Review
+- **Linear:** Done
