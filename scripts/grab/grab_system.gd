@@ -1,6 +1,8 @@
 class_name GrabSystem
 extends Node
 
+signal item_released(item: Node3D)
+
 const _GrabSelector := preload("res://scripts/grab/grab_selector.gd")
 
 @export var left_hand_holder: Node3D
@@ -28,6 +30,26 @@ func _holder_for_hand(hand: StringName) -> Node3D:
 	if hand == &"left":
 		return left_hand_holder
 	return right_hand_holder
+
+
+func get_held(hand: StringName) -> Node3D:
+	if not _held.has(hand):
+		return null
+	var target: Node3D = _held[hand]
+	if target == null or not is_instance_valid(target):
+		_held.erase(hand)
+		return null
+	return target
+
+
+func release_hand(hand: StringName) -> void:
+	if not _held.has(hand):
+		return
+	var target: Node3D = _held[hand]
+	_held.erase(hand)
+	if target != null and is_instance_valid(target):
+		target.release()
+		item_released.emit(target)
 
 
 func _process(_delta: float) -> void:
@@ -79,9 +101,4 @@ func _on_pinch_ended() -> void:
 	if hand_input == null:
 		return
 	var hand: StringName = hand_input.active_hand
-	if not _held.has(hand):
-		return
-	var target: Node3D = _held[hand]
-	_held.erase(hand)
-	if target != null and is_instance_valid(target):
-		target.release()
+	release_hand(hand)

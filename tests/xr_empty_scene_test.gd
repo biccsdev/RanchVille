@@ -102,10 +102,8 @@ func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	assert_bool(root.has_node("GrabSystem")).is_true()
 	assert_bool(root.has_node("HandInputXr")).is_true()
 	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
-	assert_bool(farm_root.has_node("DebugGrabbable")).is_true()
-	assert_bool(farm_root.has_node("DebugGrabbable2")).is_true()
-	var green: Node = farm_root.get_node("DebugGrabbable2")
-	assert_str(green.scene_file_path).is_equal("res://scenes/debug_grabbable_green.tscn")
+	assert_bool(farm_root.has_node("DebugGrabbable")).is_false()
+	assert_bool(farm_root.has_node("DebugGrabbable2")).is_false()
 	var xr_script: Script = root.get_node("HandInputXr").get_script()
 	assert_str(xr_script.source_code).contains("../XROrigin3D/RightHand")
 	assert_bool(xr_script.source_code.contains("PinchDetector")).is_false()
@@ -122,6 +120,27 @@ func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	assert_str(point_script.source_code).contains("HandDetectMarker")
 	assert_str(point_script.source_code).contains("RightHandTracked")
 	assert_bool(point_script.source_code.contains("HAND_JOINT")).is_false()
+
+
+func test_xr_empty_has_planting_and_soil_tiles() -> void:
+	var packed: PackedScene = load(_MAIN_SCENE) as PackedScene
+	var root: Node = auto_free(packed.instantiate())
+	assert_bool(root.has_node("PlantingSystem")).is_true()
+	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
+	assert_bool(farm_root.has_node("SoilTileEmpty")).is_true()
+	assert_bool(farm_root.has_node("SoilTileTilled")).is_true()
+	assert_bool(farm_root.has_node("SeedItem")).is_true()
+	assert_bool(farm_root.has_node("SeedItem2")).is_true()
+	var marker: MeshInstance3D = farm_root.get_node("Marker") as MeshInstance3D
+	assert_object(marker).is_not_null()
+	var seed: Node = farm_root.get_node("SeedItem")
+	assert_str(seed.scene_file_path).is_equal("res://scenes/seed_item.tscn")
+	var plant_range_m := 0.08
+	var empty: Node3D = farm_root.get_node("SoilTileEmpty") as Node3D
+	var tilled: Node3D = farm_root.get_node("SoilTileTilled") as Node3D
+	var seed2: Node3D = farm_root.get_node("SeedItem2") as Node3D
+	assert_float((seed as Node3D).position.distance_to(empty.position)).is_greater(plant_range_m)
+	assert_float(seed2.position.distance_to(tilled.position)).is_greater(plant_range_m)
 
 
 func test_debug_grabbable_uses_grabbable_script() -> void:

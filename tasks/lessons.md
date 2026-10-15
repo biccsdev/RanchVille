@@ -1,5 +1,22 @@
 # Lessons
 
+## BIC-22 demo has no till tool
+
+This issue only plants. It does not till.
+The grass pad must stay empty. The brown pad starts tilled.
+Seeds must spawn farther than `plant_range_m` (0.08 m).
+Spawn on that edge makes a grab-and-release plant at once.
+The cream seed then looks like it was already planted.
+
+## M1 plant path has unscoped world steps
+
+Issue numbers 18-21 are not a skip after BIC-17. Those tickets ran first.
+BIC-22 is not blocked by BIC-20. Drop-on-release can plant without poke.
+Still say the world gaps out loud: no till-in-scene ticket, no soil Node3D
+ticket, no drop-hit ticket, no live growth tick until BIC-27.
+BIC-22 must spawn pre-tilled world tiles and detect seed drop itself.
+Do not tell the user to jump 17 to 22 without naming those gaps.
+
 ## Do not start the next Linear issue on a merge note
 
 When the user says a device test passed and a PR merged, only close that issue.

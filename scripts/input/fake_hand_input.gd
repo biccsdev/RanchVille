@@ -18,5 +18,6 @@ func pinch_end(hand: StringName = &"right") -> void:
 	hand_input.emit_pinch_ended()
 
 
-func poke() -> void:
+func poke(hand: StringName = &"right") -> void:
+	hand_input.active_hand = hand
 	hand_input.emit_poke()

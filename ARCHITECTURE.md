@@ -116,9 +116,17 @@ Tests use a fake input helper that emits the same signals without a headset.
 
 **GrabSelector** (`scripts/grab/grab_selector.gd`) is headless-testable: `pick_nearest(origin, range_m, nodes)` and `pick_nearest_grabbable(origin, nodes)` (per-object range from each **Grabbable**).
 
-**GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold.
+**GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold and emits **`item_released`**. **`get_held(hand)`** and **`release_hand(hand)`** expose the active hold for tools such as planting.
 
-Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. Orange and green **Grabbable** cubes sit on FarmRoot. In-range targets show a solid yellow outline before pinch.
+Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. BIC-19 orange and green debug cubes are not in the live farm. Grab targets on FarmRoot are the cream **SeedItem** instances. In-range targets show a solid yellow outline before pinch.
+
+## Planting (BIC-22)
+
+**SoilTile** (`scripts/farm/soil_tile.gd`) remains a headless **RefCounted** state machine: empty → tilled → planted. **SoilTileView** (`scripts/farm/soil_tile_view.gd`, group `soil_tile`) owns a **SoilTile** instance, shows a placeholder pad mesh, and exposes **`try_plant()`**. Export **`start_tilled`** seeds a demo tile without a till tool.
+
+**SeedItem** (`scripts/farm/seed_item.gd`) extends **Grabbable** (groups `grabbable` and `seed`). Export **`crop_id`** for later shop and growth wiring; this issue does not start **CropGrowth** or watering.
+
+**PlantingSystem** (`scripts/farm/planting_system.gd`) listens to **GrabSystem** **`item_released`** (drop) and **HandInput** **`poke`**. It picks the nearest **`soil_tile`** within **`plant_range_m`** (default 0.08 m). **`SoilTile.plant()`** must succeed (tile tilled). On success the seed is released if held and **`queue_free`**. Empty and planted tiles reject the seed with no state change. Scenes: **`scenes/seed_item.tscn`**, **`scenes/soil_tile.tscn`**, wired under **FarmRoot** in **`xr_empty.tscn`** with one empty pad, one pre-tilled pad, and two seeds for device tests.
 
 **HandInteractionPoint** is a child of each `XRController3D` (grip pose) while a controller is in use. When `/user/hand_tracker/*` has optical data, it follows the sibling `XRNode3D` (`LeftHandTracked` / `RightHandTracked`, pose `default`). That is the official OpenXR hand pose. Grab parents to that point. A small sphere is cyan on optical hands, dim on the controller. `HandTrackerLookup` reads the official tracker. `project.godot` references `openxr_action_map.tres`.
 
