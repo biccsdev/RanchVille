@@ -8,6 +8,9 @@
 [ext_resource type="PackedScene" path="res://scenes/debug_grabbable.tscn" id="6_debug_grabbable"]
 [ext_resource type="Script" uid="uid://bjchbt1cfrsfq" path="res://scripts/xr/hand_interaction_point.gd" id="7_interaction_point"]
 [ext_resource type="PackedScene" path="res://scenes/debug_grabbable_green.tscn" id="8_debug_grabbable_green"]
+[ext_resource type="Script" path="res://scripts/farm/planting_system.gd" id="9_planting_system"]
+[ext_resource type="PackedScene" path="res://scenes/soil_tile.tscn" id="10_soil_tile"]
+[ext_resource type="PackedScene" path="res://scenes/seed_item.tscn" id="11_seed_item"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_marker"]
 size = Vector3(0.075, 0.075, 0.075)
@@ -65,6 +68,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0, 0)
 [node name="DebugGrabbable2" parent="FarmRoot" instance=ExtResource("8_debug_grabbable_green")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0, 0)
 
+[node name="SoilTileEmpty" parent="FarmRoot" instance=ExtResource("10_soil_tile")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05, 0, 0.14)
+
+[node name="SoilTileTilled" parent="FarmRoot" instance=ExtResource("10_soil_tile")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0, 0.14)
+start_tilled = true
+
+[node name="SeedItem" parent="FarmRoot" instance=ExtResource("11_seed_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05, 0, 0.06)
+
+[node name="SeedItem2" parent="FarmRoot" instance=ExtResource("11_seed_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0, 0.06)
+
 [node name="TableAnchor" type="Node" parent="." unique_id=201104749]
 script = ExtResource("2_table_anchor")
 
@@ -75,6 +91,10 @@ script = ExtResource("4_hand_input_xr")
 script = ExtResource("5_grab_system")
 left_hand_holder = NodePath("../XROrigin3D/LeftHand/InteractionPoint")
 right_hand_holder = NodePath("../XROrigin3D/RightHand/InteractionPoint")
+
+[node name="PlantingSystem" type="Node" parent="."]
+script = ExtResource("9_planting_system")
+grab_system = NodePath("../GrabSystem")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=454710415]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 4, 0)

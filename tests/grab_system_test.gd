@@ -73,6 +73,23 @@ func test_pinch_end_releases_held_object() -> void:
 	assert_bool(ctx["near"].is_held()).is_false()
 
 
+func test_get_held_returns_active_grab() -> void:
+	var ctx := _wire_scene()
+	ctx["fake"].pinch_start(&"right")
+	assert_object(ctx["grab_system"].get_held(&"right")).is_same(ctx["near"])
+	assert_object(ctx["grab_system"].get_held(&"left")).is_null()
+
+
+func test_item_released_emits_on_pinch_end() -> void:
+	var ctx := _wire_scene()
+	var released: Array = []
+	ctx["grab_system"].item_released.connect(func(item: Node3D) -> void: released.append(item))
+	ctx["fake"].pinch_start(&"right")
+	ctx["fake"].pinch_end(&"right")
+	assert_int(released.size()).is_equal(1)
+	assert_object(released[0]).is_same(ctx["near"])
+
+
 func test_left_pinch_end_does_not_release_right_hand_hold() -> void:
 	var ctx := _wire_scene()
 	ctx["fake"].pinch_start(&"right")

@@ -124,6 +124,21 @@ func test_xr_empty_has_grab_system_and_hand_input_xr() -> void:
 	assert_bool(point_script.source_code.contains("HAND_JOINT")).is_false()
 
 
+func test_xr_empty_has_planting_and_soil_tiles() -> void:
+	var packed: PackedScene = load(_MAIN_SCENE) as PackedScene
+	var root: Node = auto_free(packed.instantiate())
+	assert_bool(root.has_node("PlantingSystem")).is_true()
+	var farm_root: Node3D = root.get_node("FarmRoot") as Node3D
+	assert_bool(farm_root.has_node("SoilTileEmpty")).is_true()
+	assert_bool(farm_root.has_node("SoilTileTilled")).is_true()
+	assert_bool(farm_root.has_node("SeedItem")).is_true()
+	assert_bool(farm_root.has_node("SeedItem2")).is_true()
+	var marker: MeshInstance3D = farm_root.get_node("Marker") as MeshInstance3D
+	assert_object(marker).is_not_null()
+	var seed: Node = farm_root.get_node("SeedItem")
+	assert_str(seed.scene_file_path).is_equal("res://scenes/seed_item.tscn")
+
+
 func test_debug_grabbable_uses_grabbable_script() -> void:
 	var packed: PackedScene = load("res://scenes/debug_grabbable.tscn") as PackedScene
 	var prop: Node = auto_free(packed.instantiate())
