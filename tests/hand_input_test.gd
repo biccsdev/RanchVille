@@ -5,6 +5,7 @@ const _HandInputScript := preload("res://scripts/input/hand_input.gd")
 const _FakeHandInputScript := preload("res://scripts/input/fake_hand_input.gd")
 const _HAND_INPUT_SCRIPT := "res://scripts/input/hand_input.gd"
 const _FAKE_HAND_INPUT_SCRIPT := "res://scripts/input/fake_hand_input.gd"
+const _CONTROLLER_MAPPING_SCRIPT := "res://scripts/input/controller_mapping.gd"
 const _PROJECT_SETTINGS := "res://project.godot"
 
 
@@ -71,11 +72,13 @@ func test_fake_poke_fires_once_per_event() -> void:
 
 
 func test_input_scripts_do_not_reference_openxr() -> void:
+	for path in [_HAND_INPUT_SCRIPT, _FAKE_HAND_INPUT_SCRIPT, _CONTROLLER_MAPPING_SCRIPT]:
+		var text := FileAccess.get_file_as_string(path)
+		assert_bool(text.contains("OpenXR")).is_false()
+		assert_bool(text.contains("XRHand")).is_false()
 	for path in [_HAND_INPUT_SCRIPT, _FAKE_HAND_INPUT_SCRIPT]:
 		var text := FileAccess.get_file_as_string(path)
 		assert_str(text).contains("pinch_started")
-		assert_bool(text.contains("OpenXR")).is_false()
-		assert_bool(text.contains("XRHand")).is_false()
 
 
 func test_project_registers_hand_input_autoload() -> void:

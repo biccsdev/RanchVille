@@ -100,13 +100,15 @@ flowchart LR
 - `pinch_ended`
 - `poke`
 
-**PinchDetector** (`scripts/input/pinch_detector.gd`) is headless-testable pure geometry: thumb-tip and index-tip `Vector3` positions in, pinched or not out. Threshold: `PinchDetector.PINCH_DISTANCE_M` (meters); pinched when tip distance is less than or equal to that value (inclusive boundary). `apply()` emits `pinch_started` / `pinch_ended` on **HandInput** only when state changes. Live XR does not use this detector. **HandInputXr** maps OpenXR `pinch_ext` / `grasp_ext` (trigger and grip actions). All gameplay code subscribes to **HandInput** only.
+**PinchDetector** (`scripts/input/pinch_detector.gd`) is headless-testable pure geometry: thumb-tip and index-tip `Vector3` positions in, pinched or not out. Threshold: `PinchDetector.PINCH_DISTANCE_M` (meters); pinched when tip distance is less than or equal to that value (inclusive boundary). `apply()` emits `pinch_started` / `pinch_ended` on **HandInput** only when state changes. Live XR does not use this detector.
+
+**ControllerMapping** (`scripts/input/controller_mapping.gd`) is headless-testable Quest Touch fallback: `trigger` / `trigger_click` and `grip` / `grip_click` (analog above `ControllerMapping.ANALOG_PINCH_THRESHOLD`) count as pinch; `ax_button` (A on the right controller, X on the left) emits **poke** as a one-shot press. All gameplay code subscribes to **HandInput** only.
 
 Tests use a fake input helper that emits the same signals without a headset.
 
-**HandInput** also exposes `active_hand` (`&"left"` or `&"right"`). XR and fake sources set it before each pinch emit so grab logic knows which holder to use.
+**HandInput** also exposes `active_hand` (`&"left"` or `&"right"`). XR and fake sources set it before each pinch or poke emit so grab logic knows which holder to use.
 
-**HandInputXr** (`scripts/xr/hand_input_xr.gd`) maps OpenXR actions on `XRController3D` (`trigger` / `trigger_click`, `grip` / `grip_click`) to **HandInput** pinch start/end. Hands use the same actions: the action map binds `pinch_ext`, `grasp_ext`, and Microsoft `select` / `squeeze` to those paths. `project.godot` enables `hand_interaction_profile` and the hand-tracking data sources. OpenXR types stay under `scripts/xr/` only.
+**HandInputXr** (`scripts/xr/hand_input_xr.gd`) uses **ControllerMapping** on `XRController3D` actions and forwards pinch and poke to **HandInput**. Hands use the same action paths: the action map binds `pinch_ext`, `grasp_ext`, and Microsoft `select` / `squeeze` to trigger and grip. `project.godot` enables `hand_interaction_profile` and the hand-tracking data sources. OpenXR types stay under `scripts/xr/` only.
 
 ## Grab (BIC-19)
 
