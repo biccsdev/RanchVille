@@ -19,9 +19,11 @@
 
 ### Quest 3 test steps
 
+This issue does **not** till. The grass pad stays empty on purpose.
+
 1. Place the farm on the table.
-2. Confirm one pad is grass (empty) and one pad is brown (tilled). Two cream seeds sit in front.
-3. Pinch a seed. Confirm the yellow outline. Move it onto the **tilled** pad. Release pinch. The pad shows the planted bump. The seed disappears.
-4. Pinch the second seed. Drop it on the **same planted** pad. The pad stays planted. The seed stays in the world.
-5. Grab that seed. Drop it on the **empty** pad. The pad stays grass. The seed stays in the world.
-6. Optional if BIC-17 poke is on the build: hold a seed over a fresh tilled pad and press A/X. The pad plants.
+2. Layout: two cream seeds near the gray marker. One **green** pad (empty). One **brown** pad (pre-tilled, no bump yet).
+3. Pinch a seed. Move it onto the **brown** pad. Release. The seed vanishes. A small cream bump stays on the brown pad.
+4. Pinch the second seed. Drop it on that **same brown pad**. The bump stays. The seed stays in your hand world (not consumed).
+5. Drop that seed on the **green** pad. The pad stays green. The seed stays. You cannot till in this build.
+6. Optional if BIC-17 poke is on the build: hold a seed over a fresh brown pad and press A/X. The pad plants.

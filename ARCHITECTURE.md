@@ -118,7 +118,7 @@ Tests use a fake input helper that emits the same signals without a headset.
 
 **GrabSystem** (`scripts/grab/grab_system.gd`) listens to **HandInput** pinch signals. On pinch start it picks the nearest in-range **Grabbable** for `active_hand` and attaches it to the matching scene holder. Pinch end releases only that hand’s hold and emits **`item_released`**. **`get_held(hand)`** and **`release_hand(hand)`** expose the active hold for tools such as planting.
 
-Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. Orange and green **Grabbable** cubes sit on FarmRoot. In-range targets show a solid yellow outline before pinch.
+Debug props: gray **Marker** (`MeshInstance3D`, table placement) stays a mesh so **TableAnchor** can restyle it. BIC-19 orange and green debug cubes are not in the live farm. Grab targets on FarmRoot are the cream **SeedItem** instances. In-range targets show a solid yellow outline before pinch.
 
 ## Planting (BIC-22)
 
