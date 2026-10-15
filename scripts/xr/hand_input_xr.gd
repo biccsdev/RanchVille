@@ -1,6 +1,8 @@
 class_name HandInputXr
 extends Node
 
+const _ControllerMapping := preload("res://scripts/input/controller_mapping.gd")
+
 @onready var left_hand: XRController3D = $"../XROrigin3D/LeftHand"
 @onready var right_hand: XRController3D = $"../XROrigin3D/RightHand"
 
@@ -27,15 +29,12 @@ func _update_pinch(side: StringName, hand: XRController3D) -> void:
 func _runtime_pinching(hand: XRController3D) -> bool:
 	if hand == null:
 		return false
-	if hand.is_button_pressed(&"trigger_click"):
-		return true
-	if hand.is_button_pressed(&"grip_click"):
-		return true
-	if hand.get_float(&"trigger") > 0.5:
-		return true
-	if hand.get_float(&"grip") > 0.5:
-		return true
-	return false
+	return _ControllerMapping.is_pinching(
+		hand.is_button_pressed(&"trigger_click"),
+		hand.is_button_pressed(&"grip_click"),
+		hand.get_float(&"trigger"),
+		hand.get_float(&"grip"),
+	)
 
 
 func _emit_pinch_edge(side: StringName, pinched: bool) -> void:
@@ -63,13 +62,20 @@ func _hand_input() -> Node:
 
 
 func _on_button_pressed(button_name: StringName, hand: XRController3D) -> void:
-	if button_name != &"trigger_click" and button_name != &"grip_click":
+	if _ControllerMapping.is_poke_button(button_name):
+		var bus: Node = _hand_input()
+		if bus == null:
+			return
+		bus.active_hand = _hand_id(hand)
+		bus.emit_poke()
+		return
+	if not _ControllerMapping.is_pinch_button(button_name):
 		return
 	_emit_pinch_edge(_hand_id(hand), true)
 
 
 func _on_button_released(button_name: StringName, hand: XRController3D) -> void:
-	if button_name != &"trigger_click" and button_name != &"grip_click":
+	if not _ControllerMapping.is_pinch_button(button_name):
 		return
 	if _runtime_pinching(hand):
 		return
